@@ -35,7 +35,7 @@ const page = () => {
   return (
     <View style={customStyles.view}>
       {
-        !grades && <Button onPress={getGrades} title='Test Grade' />
+        !grades.length && <Button onPress={getGrades} title='Test Grade' />
       }
       <ScrollView style={customStyles.scrollView}>
         <ScrollView horizontal={true}>

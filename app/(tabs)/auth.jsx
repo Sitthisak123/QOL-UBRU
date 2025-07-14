@@ -11,7 +11,7 @@ export default function Auth() {
   const [text, setText] = useState('')
   const theme = useTheme();
   const [isTextSecure, setIsTextSecure] = useState(true);
-  const [dataInput, setDataInput] = useState({ STDID: '66122420321', pass: 'JamesGamer1' });
+  const [dataInput, setDataInput] = useState({ STDID: '66122420321', pass: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [isTextExceed, setTextExceed] = useState(false);
 
@@ -58,6 +58,7 @@ export default function Auth() {
           },
         }
       );
+      console.warn("response data: ", response.status);
       const { SSID } = response.data;
       console.log("response messegae: ", response.data.msg);
       console.log("response Status: ", response.status);
