@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "QOL-UBRU",
-    "slug": "QOL-UBRU",
+    "slug": "qol-ubru",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -43,8 +43,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "7773ebfd-2e1d-47e1-8c85-3a2f5e255e9a"
+        "projectId": "07a579cc-25f8-4e88-b14b-d12721d64094"
       }
-    }
+    },
+    "owner": "xda-7"
   }
 }

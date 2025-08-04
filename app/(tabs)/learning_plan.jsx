@@ -13,7 +13,7 @@ const page = () => {
     const getTables = async () => {
         try {
             const SSID = await asyncStorage_getItem('SSID');
-            const response = await axios.get(process.env.EXPO_PUBLIC_API_CSTB,
+            const response = await axios.get(process.env.EXPO_PUBLIC_API_PLAN,
                 {
                     headers: {
                         "SSID": SSID,
@@ -42,7 +42,7 @@ const page = () => {
                 onChangeText={(term) => setddTerm(term)}
                 style={{marginTop: 5}}
             />
-            <Button onPress={getTables} title='Test Grade' />
+            <Button onPress={getTables} title='Test Plan' />
             <ScrollView style={customStyles.scrollView}>
                 <ScrollView horizontal={true}>
                     <DataTable>

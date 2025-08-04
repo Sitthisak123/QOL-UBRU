@@ -26,8 +26,8 @@ export default function Index() {
 
 
   useLayoutEffect(() => {
-    const timer = setTimeout(() => {
-      if (!(asyncStorage_getItem('SSID') && asyncStorage_getItem('USER'))) {
+    const timer = setTimeout(async () => {
+      if ( !(await asyncStorage_getItem('SSID') && await asyncStorage_getItem('USER')) ) {
         router.replace("auth", { relativeToDirectory: true });
       } else {
         router.replace("home", { relativeToDirectory: true });

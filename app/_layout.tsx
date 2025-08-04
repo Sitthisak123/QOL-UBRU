@@ -44,14 +44,14 @@ export default function RootLayout() {
           <Drawer.Screen
             name="index" // Matches app/(drawer)/index.tsx
             options={{
-              drawerLabel: 'Home',
+              drawerLabel: 'Index',
               title: 'Overview',
             }}
           />
           <Drawer.Screen
-            name="grades" // Matches app/(drawer)/user/[id].tsx
+            name="(tabs)/grades" // Matches app/(drawer)/user/[id].tsx
             options={{
-              drawerLabel: 'User',
+              drawerLabel: 'Grades',
               title: 'User Overview',
             }}
           />

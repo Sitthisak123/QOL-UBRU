@@ -35,7 +35,7 @@ const page = () => {
   return (
     <View style={customStyles.view}>
       {
-        !grades.length && <Button onPress={getGrades} title='Test Grade' />
+        !grades.length ? <Button onPress={getGrades} title='Test Grade' /> : null
       }
       <ScrollView style={customStyles.scrollView}>
         <ScrollView horizontal={true}>
@@ -123,6 +123,7 @@ const dataExtract = (strHTML) => {
   } else {
     // console.log("\x1b[31m%s\x1b[0m","request ejected!!! to fix pls re-login.");
     console.warn("request ejected!!! to fix pls re-login.");
+    return [];
   }
 
 }

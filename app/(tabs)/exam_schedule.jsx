@@ -12,8 +12,9 @@ const page = () => {
 
     const getTables = async () => {
         try {
+            setTables([]); // Clear previous tables
             const SSID = await asyncStorage_getItem('SSID');
-            const response = await axios.get(process.env.EXPO_PUBLIC_API_CSTB,
+            const response = await axios.get(process.env.EXPO_PUBLIC_API_EXTB,
                 {
                     headers: {
                         "SSID": SSID,
@@ -21,6 +22,7 @@ const page = () => {
                     },
                 }
             );
+            // console.log("Response data:", response.data);
             dataExtract(response.data, ddTerm, setTables);
             console.log("Tables fetched successfully:", tables);
         } catch (error) {
@@ -42,7 +44,7 @@ const page = () => {
                 onChangeText={(term) => setddTerm(term)}
                 style={{marginTop: 5}}
             />
-            <Button onPress={getTables} title='Test Grade' />
+            <Button onPress={getTables} title='Test EX' />
             <ScrollView style={customStyles.scrollView}>
                 <ScrollView horizontal={true}>
                     <DataTable>

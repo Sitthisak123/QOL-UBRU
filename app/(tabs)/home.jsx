@@ -5,6 +5,8 @@ import { Text, TextInput, useTheme, Button, IconButton } from 'react-native-pape
 import { asyncStorage_getItem } from "@/utility/db/AsyncStorage";
 import { useEffect, useState } from "react";
 import { Drawer } from 'react-native-paper';
+import { router } from "expo-router";
+
 
 export default function index() {
   const theme = useTheme();

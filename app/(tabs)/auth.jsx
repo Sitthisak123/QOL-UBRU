@@ -11,7 +11,7 @@ export default function Auth() {
   const [text, setText] = useState('')
   const theme = useTheme();
   const [isTextSecure, setIsTextSecure] = useState(true);
-  const [dataInput, setDataInput] = useState({ STDID: '66122420321', pass: '' });
+  const [dataInput, setDataInput] = useState({ STDID: '66122420321', pass: 'JamesGamer1' });
   const [isLoading, setIsLoading] = useState(false);
   const [isTextExceed, setTextExceed] = useState(false);
 
@@ -19,8 +19,9 @@ export default function Auth() {
     view: {
       flex: 1,
       backgroundColor: theme.colors.background,
-      justifyContent: 'center',
+      // justifyContent: 'center',
       alignItems: 'center',
+      paddingTop: 60,
     },
     accept_btn: {
       maxWidth: 130,
@@ -46,6 +47,7 @@ export default function Auth() {
   const onLogin = async () => {
     setIsLoading(true);
     try {
+      console.log(process.env.EXPO_PUBLIC_API_AUTH);
       const response = await axios.post(process.env.EXPO_PUBLIC_API_AUTH,
         {
           txtUser: dataInput.STDID,
