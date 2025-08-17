@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useLayoutEffect } from "react";
 import { View, AppState } from "react-native";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { asyncStorage_getItem } from "@/utility/db/AsyncStorage";
+import { asyncStorage_getItem } from "./utils/db/AsyncStorage";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {

@@ -1,5 +1,5 @@
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useNavigation } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -25,6 +25,7 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+  
 
   useEffect(() => {
     if (loaded) {
@@ -53,6 +54,15 @@ export default function RootLayout() {
             options={{
               drawerLabel: 'Grades',
               title: 'User Overview',
+            }}
+          />
+          <Drawer.Screen
+            name="(tabs)/init" // Matches app/(drawer)/user/[id].tsx
+            options={{
+              drawerLabel: 'Initialization',
+              title: '',
+              swipeEnabled: false, // disable just for this screen.
+              headerShown: false, // hide the header for this screen.
             }}
           />
         </Drawer>

@@ -2,7 +2,7 @@ import { View, AppState } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, BackHandler, TouchableWithoutFeedback, Platform } from "react-native";
 import { Text, TextInput, useTheme, Button, IconButton } from 'react-native-paper';
-import { asyncStorage_getItem } from "@/utility/db/AsyncStorage";
+import { asyncStorage_getItem } from "../utils/db/AsyncStorage";
 import { useEffect, useState } from "react";
 import { Drawer } from 'react-native-paper';
 import { router } from "expo-router";

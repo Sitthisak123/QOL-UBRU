@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { useEffect } from 'react';
 import { Button, ScrollView, Text, View } from "react-native";
 import cheerio from 'react-native-cheerio';
-import { asyncStorage_getItem } from "@/utility/db/AsyncStorage";
+import { asyncStorage_getItem } from "../utils/db/AsyncStorage";
 import { DataTable, TextInput } from 'react-native-paper';
 
 const page = () => {

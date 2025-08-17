@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Text, TextInput, useTheme, Button } from 'react-native-paper';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, BackHandler, TouchableWithoutFeedback, Platform } from "react-native";
-import { asyncStorage_setItem } from "@/utility/db/AsyncStorage";
+import { asyncStorage_setItem } from "../utils/db/AsyncStorage";
 import { router } from "expo-router";
 
 export default function Auth() {
@@ -61,13 +61,13 @@ export default function Auth() {
         }
       );
       console.warn("response data: ", response.status);
-      const { SSID } = response.data;
+      const { SSID, HTML } = response.data;
       console.log("response messegae: ", response.data.msg);
       console.log("response Status: ", response.status);
       await asyncStorage_setItem('SSID', SSID);
       await asyncStorage_setItem('USER', { textUser: dataInput.STDID, txtPass: dataInput.pass });
       setIsLoading(false);
-      router.replace("/..");
+      router.replace("/init");
     } catch (error) {
       setIsLoading(false);
       console.error("Auth error:", error.response.data.msg);
