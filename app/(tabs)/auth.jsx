@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, BackHandler, TouchableWithoutFeedback, Platform } from "react-native";
 import { asyncStorage_setItem } from "../utils/db/AsyncStorage";
 import { router } from "expo-router";
+import { useUserInfo } from "../utils/store/useStore";
 
 export default function Auth() {
   const maxSTDID = 11
@@ -14,6 +15,7 @@ export default function Auth() {
   const [dataInput, setDataInput] = useState({ STDID: '66122420321', pass: 'JamesGamer1' });
   const [isLoading, setIsLoading] = useState(false);
   const [isTextExceed, setTextExceed] = useState(false);
+  const setLogin = useUserInfo((state) => state.login);
 
   const customStyles = StyleSheet.create({
     view: {
@@ -61,11 +63,12 @@ export default function Auth() {
         }
       );
       console.warn("response data: ", response.status);
-      const { SSID, HTML } = response.data;
+      const { SSID } = response.data;
       console.log("response messegae: ", response.data.msg);
       console.log("response Status: ", response.status);
       await asyncStorage_setItem('SSID', SSID);
       await asyncStorage_setItem('USER', { textUser: dataInput.STDID, txtPass: dataInput.pass });
+      setLogin({ SSID, textUser: dataInput.STDID});
       setIsLoading(false);
       router.replace("/init");
     } catch (error) {
