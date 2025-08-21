@@ -22,7 +22,24 @@ async function getScheduleAPI(ddTerm) {
     }
 };
 
-async function getPlanAPI(ddterm) {
+async function getPlanAPI(ddTerm, sep) {
+    try {
+        const SSID = await asyncStorage_getItem('SSID');
+        const response = await axios.get(process.env.EXPO_PUBLIC_API_PLAN,
+            {
+                headers: {
+                    "SSID": SSID,
+                    ...(ddTerm ? { ddTerm } : {}),
+                    sep,
+                },
+            }
+        );
+
+        const data = await courseSchedule_DataExtract(response.data);
+        return data
+    } catch (error) {
+        console.error("Request error:", error);
+    }
 
 }
 
@@ -61,6 +78,29 @@ async function fetchSchedules(ssid, step = 0, setFetchProgress) {
             console.log(data);
         } else {
             console.error("Failed to fetch course schedule. ddterm:", ddTerm);
+            return
+        }
+        await new Promise(resolve => setTimeout(resolve, 550));
+    }
+}
+
+async function fetchPlans(ssid, step = 0, setFetchProgress) {
+    let ddTerm = 1;
+    let data = {};
+    const sep = Math.floor(step / 2)
+    console.log("fetch plan. sep:", sep);
+    for (let j = 1; j < 4; j++) {
+        //check if setFetchProgress is a function
+        if (typeof setFetchProgress === 'function') {
+            setFetchProgress(prev => ({ ...prev, plan: prev.plan + 1 }));
+        }
+        ddTerm = `${j}/${ssid + step}`;
+        console.log("\nfetch plan. ddterm:", ddTerm);
+        data = await getPlanAPI(ddTerm, sep);
+        if (data) {
+            console.log(data);
+        } else {
+            console.error("Failed to fetch course plan. ddterm:", ddTerm);
             return
         }
         await new Promise(resolve => setTimeout(resolve, 550));
@@ -146,4 +186,5 @@ const examSchedule_DataExtract = (strHTML) => {
 export {
     getScheduleAPI, fetchSchedules,
     getExamScheduleAPI, fetchExamSchedules,
+    getPlanAPI, fetchPlans
 }
