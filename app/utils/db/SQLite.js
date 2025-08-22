@@ -58,7 +58,7 @@ export const Grade = {
                     Teacher TEXT,
                     GroupName TEXT,
                     Transferred INTEGER,
-                    Credit INTEGER
+                    Credit TEXT
                 );`
             );
         } catch (error) {

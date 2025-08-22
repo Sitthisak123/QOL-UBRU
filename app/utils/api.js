@@ -114,7 +114,10 @@ async function fetchExamSchedules(ssid, step = 0, setFetchProgress) {
 
     for (let j = 1; j < 4; j++) {
         //check if setFetchProgress is a function
-        
+        if (typeof setFetchProgress === 'function') {
+            setFetchProgress(prev => ({ ...prev, ExamSchedule: prev.ExamSchedule + 1 }));
+        }
+
         ddTerm = `${j}/${ssid + step}`;
         // console.log("fetch exam schedule. ddterm:", ddTerm);
         data = await getExamScheduleAPI(ddTerm);
@@ -127,11 +130,8 @@ async function fetchExamSchedules(ssid, step = 0, setFetchProgress) {
         await new Promise(resolve => setTimeout(resolve, 550));
     }
 }
-async function fetchGrades(setFetchProgress) {
+async function fetchGrades() {
     try {
-        if (typeof setFetchProgress === 'function') {
-            setFetchProgress(prev => ({ ...prev, ExamSchedule: prev.grade + 1 }));
-        }
         const SSID = await asyncStorage_getItem('SSID');
         const response = await axios.get(process.env.EXPO_PUBLIC_API_GRADES,
             {
@@ -224,36 +224,36 @@ function insertCourse(rows, semester, year) {
     });
 }
 
-function grade_DataExtract (strHTML) {
-  const $ = cheerio.load(strHTML, { decodeEntities: false });
-  const courses = $('#dgv tr').toArray();
+function grade_DataExtract(strHTML) {
+    const $ = cheerio.load(strHTML, { decodeEntities: false });
+    const courses = $('#dgv tr').toArray();
 
-  if (courses.length) {
-    return courses.reduce((acc, row) => {
-      const cells = $(row).find('td span');
-      if (cells.length > 0) {
-        const course = {
-          term: $(cells[1]).text().trim(),
-          subjectCode: $(cells[2]).text().trim(),
-          subjectName: $(cells[3]).text().trim(),
-          section: $(cells[4]).text().trim(),
-          credits: $(cells[5]).text().trim(),
-          creditFull: $(cells[6]).text().trim(),
-          teacher: $(cells[7]).text().trim(),
-          groupName: $(cells[8]).text().trim(),
-          grade: $(cells[9]).text().trim(),
-          transferExempt: $(cells[10]).text().trim(),
-          answerOK: $(cells[11]).text().trim(),
-        };
-        acc.push(course);
-      }
-      return acc;
-    }, []);
-  } else {
-    // console.log("\x1b[31m%s\x1b[0m","request ejected!!! to fix pls re-login.");
-    console.warn("request ejected!!! to fix pls re-login.");
-    return [];
-  }
+    if (courses.length) {
+        return courses.reduce((acc, row) => {
+            const cells = $(row).find('td span');
+            if (cells.length > 0) {
+                const course = {
+                    term: $(cells[1]).text().trim(),
+                    subjectCode: $(cells[2]).text().trim(),
+                    subjectName: $(cells[3]).text().trim(),
+                    section: $(cells[4]).text().trim(),
+                    credits: $(cells[5]).text().trim(),
+                    creditFull: $(cells[6]).text().trim(),
+                    teacher: $(cells[7]).text().trim(),
+                    groupName: $(cells[8]).text().trim(),
+                    grade: $(cells[9]).text().trim(),
+                    transferExempt: $(cells[10]).text().trim(),
+                    answerOK: $(cells[11]).text().trim(),
+                };
+                acc.push(course);
+            }
+            return acc;
+        }, []);
+    } else {
+        // console.log("\x1b[31m%s\x1b[0m","request ejected!!! to fix pls re-login.");
+        console.warn("request ejected!!! to fix pls re-login.");
+        return [];
+    }
 
 }
 

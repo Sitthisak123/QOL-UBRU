@@ -11,7 +11,7 @@ function init() {
     const theme = useTheme();
     const textUser = useUserInfo((state) => state.USER_info.textUser);
     const [fecthProgress, setFetchProgress] = useState({ plan: 0, schedule: 0, ExamSchedule: 0, grade: 0 });
-    const taltolFecthtask = { plan: 12, schedule: 9, ExamSchedule: 10, grade: 1 };
+    const taltolFecthtask = { plan: 12, schedule: 9, ExamSchedule: 9, grade: 1 };
     const [isProgressing, setIsProgress] = useState({ plan: false, schedule: false, ExamSchedule: false, grade: false });
 
     const customStyles = StyleSheet.create({
@@ -70,30 +70,33 @@ function init() {
         const learnedYear = Math.abs(firstTwoSSID - (new Date().getFullYear() + 543) % 100);
         await resetDB();
 
-        // //Step 1: Fetch course schedule
-        // setIsProgress(prev => ({ ...prev, schedule: true }));
-        // for (let i = 0; i < learnedYear + 1; i++) {
-        //     await fetchSchedules(firstTwoSSID, i, setFetchProgress);
-        //     await new Promise(resolve => setTimeout(resolve, 550));
-        // }
+        //Step 1: Fetch course schedule
+        setIsProgress(prev => ({ ...prev, schedule: true }));
+        for (let i = 0; i < learnedYear + 1; i++) {
+            await fetchSchedules(firstTwoSSID, i, setFetchProgress);
+            await new Promise(resolve => setTimeout(resolve, 550));
+        }
 
-        // //step 2: Fetch plan
-        // setIsProgress(prev => ({ ...prev, plan: true }));
-        // for (let i = 0; i < 4; i++) {
-        //     await fetchPlans(firstTwoSSID, i, setFetchProgress);
-        //     await new Promise(resolve => setTimeout(resolve, 550));
-        // }
+        //step 2: Fetch plan
+        setIsProgress(prev => ({ ...prev, plan: true }));
+        for (let i = 0; i < 4; i++) {
+            await fetchPlans(firstTwoSSID, i, setFetchProgress);
+            await new Promise(resolve => setTimeout(resolve, 550));
+        }
 
-        // //step 3: Fetch exam schedule
-        // setIsProgress(prev => ({ ...prev, ExamSchedule: true }));
-        // for (let i = 0; i < learnedYear + 1; i++) {
-        //     await fetchExamSchedules(firstTwoSSID, i, setFetchProgress);
-        //     await new Promise(resolve => setTimeout(resolve, 550));
-        // }
+        //step 3: Fetch exam schedule
+        setIsProgress(prev => ({ ...prev, ExamSchedule: true }));
+        for (let i = 0; i < learnedYear + 1; i++) {
+            await fetchExamSchedules(firstTwoSSID, i, setFetchProgress);
+            await new Promise(resolve => setTimeout(resolve, 550));
+        }
 
         //step 4: Fetch Grades
         setIsProgress(prev => ({ ...prev, grade: true }));
+        setFetchProgress(prev => ({ ...prev, grade: prev.grade + 1 }));
         await fetchGrades(firstTwoSSID, setFetchProgress);
+
+        await new Promise(resolve => setTimeout(resolve, 3550));
 
         router.replace("home", { relativeToDirectory: true });
     }
