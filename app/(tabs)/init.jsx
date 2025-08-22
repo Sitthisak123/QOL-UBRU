@@ -5,6 +5,7 @@ const { fetchSchedules, fetchExamSchedules, fetchPlans } = require('../utils/api
 import { asyncStorage_getItem } from '../utils/db/AsyncStorage';
 import { useUserInfo } from '../utils/store/useStore';
 import { router } from "expo-router";
+import { resetDB } from '../utils/db/SQLite';
 
 function init() {
     const theme = useTheme();
@@ -56,10 +57,6 @@ function init() {
         }
     });
 
-    // useEffect(() => {
-    //     console.warn("fetch user: ", useUserInfo.getState().USER_info);
-    // }, [textUser]);
-
     function test() {
         // useUserInfo.getState().login({...useUserInfo.getState().USER_info, textUser: ""});
         useUserInfo.getState().logout();
@@ -71,13 +68,14 @@ function init() {
         const { textUser } = await asyncStorage_getItem('USER');
         const firstTwoSSID = parseInt(textUser.slice(0, 2))
         const learnedYear = Math.abs(firstTwoSSID - (new Date().getFullYear() + 543) % 100);
-
-        //Step 1: Fetch course schedule
-        setIsProgress(prev => ({ ...prev, schedule: true }));
-        for (let i = 0; i < learnedYear + 1; i++) {
-            await fetchSchedules(firstTwoSSID, i, setFetchProgress);
-            await new Promise(resolve => setTimeout(resolve, 550));
-        }
+        await resetDB();
+        
+        // //Step 1: Fetch course schedule
+        // setIsProgress(prev => ({ ...prev, schedule: true }));
+        // for (let i = 0; i < learnedYear + 1; i++) {
+        //     await fetchSchedules(firstTwoSSID, i, setFetchProgress);
+        //     await new Promise(resolve => setTimeout(resolve, 550));
+        // }
 
         //step 2: Fetch plan
         setIsProgress(prev => ({ ...prev, plan: true }));
@@ -86,12 +84,12 @@ function init() {
             await new Promise(resolve => setTimeout(resolve, 550));
         }
 
-        //step 3: Fetch exam schedule
-        setIsProgress(prev => ({ ...prev, ExamSchedule: true }));
-        for (let i = 0; i < learnedYear + 1; i++) {
-            await fetchExamSchedules(firstTwoSSID, i, setFetchProgress);
-            await new Promise(resolve => setTimeout(resolve, 550));
-        }
+        // //step 3: Fetch exam schedule
+        // setIsProgress(prev => ({ ...prev, ExamSchedule: true }));
+        // for (let i = 0; i < learnedYear + 1; i++) {
+        //     await fetchExamSchedules(firstTwoSSID, i, setFetchProgress);
+        //     await new Promise(resolve => setTimeout(resolve, 550));
+        // }
 
         router.replace("home", { relativeToDirectory: true });
     }

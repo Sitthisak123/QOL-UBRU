@@ -5,6 +5,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { asyncStorage_getItem } from "./utils/db/AsyncStorage";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useUserInfo } from "./utils/store/useStore";
+import { initDB } from './utils/db/SQLite';
+
 
 export default function Index() {
   const setLogin = useUserInfo((state) => state.login);
@@ -27,6 +29,12 @@ export default function Index() {
 
   useLayoutEffect(() => {
     const timer = setTimeout(async () => {
+      try {
+        await initDB();
+      } catch (error) {
+        console.error("Error initializing database:", error);
+      }
+      
       const SSID = await asyncStorage_getItem('SSID')
       const userInfo = await asyncStorage_getItem('USER')
       if ((SSID && userInfo)) {

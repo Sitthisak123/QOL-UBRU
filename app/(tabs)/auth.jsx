@@ -7,8 +7,10 @@ import { asyncStorage_setItem } from "../utils/db/AsyncStorage";
 import { router } from "expo-router";
 import { useUserInfo } from "../utils/store/useStore";
 
+import { resetDB, Course } from "../utils/db/SQLite";
+import { getPlanAPI } from "../utils/api";
 export default function Auth() {
-  const maxSTDID = 11
+  const maxSTDID = 11 //char limit for student ID
   const [text, setText] = useState('')
   const theme = useTheme();
   const [isTextSecure, setIsTextSecure] = useState(true);
@@ -46,6 +48,15 @@ export default function Auth() {
     }
   });
 
+  const test2 = async () => {
+    // await resetDB();
+    // getPlanAPI('1/66');
+    const res = await Course.getAll();
+    for (const row of res) {
+      console.log(row.id, row.CourseCode, row.CourseName, row.GroupName, row.Credits, row.Semester, row.Year);
+    }
+  }
+
   const onLogin = async () => {
     setIsLoading(true);
     try {
@@ -68,7 +79,7 @@ export default function Auth() {
       console.log("response Status: ", response.status);
       await asyncStorage_setItem('SSID', SSID);
       await asyncStorage_setItem('USER', { textUser: dataInput.STDID, txtPass: dataInput.pass });
-      setLogin({ SSID, textUser: dataInput.STDID});
+      setLogin({ SSID, textUser: dataInput.STDID });
       setIsLoading(false);
       router.replace("/init");
     } catch (error) {
@@ -98,7 +109,7 @@ export default function Auth() {
 
   return (
     <SafeAreaView style={customStyles.view}>
-      <Text style={customStyles.text} variant="displayLarge">Sign in</Text>
+      <Text style={customStyles.text} variant="displayLarge" onPress={test2}>Sign in</Text>
       <TextInput
         style={customStyles.textField}
         mode="outlined"

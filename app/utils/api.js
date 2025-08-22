@@ -1,6 +1,6 @@
 import axios from 'axios';
 import cheerio from 'react-native-cheerio';
-
+import { Course } from './db/SQLite';
 const { asyncStorage_getItem } = require('../utils/db/AsyncStorage');
 
 async function getScheduleAPI(ddTerm) {
@@ -22,19 +22,18 @@ async function getScheduleAPI(ddTerm) {
     }
 };
 
-async function getPlanAPI(ddTerm, sep) {
+async function getPlanAPI(ddTerm) {
     try {
+        console.log("Fetching plan data...");
         const SSID = await asyncStorage_getItem('SSID');
         const response = await axios.get(process.env.EXPO_PUBLIC_API_PLAN,
             {
                 headers: {
                     "SSID": SSID,
                     ...(ddTerm ? { ddTerm } : {}),
-                    sep,
                 },
             }
         );
-
         const data = await courseSchedule_DataExtract(response.data);
         return data
     } catch (error) {
@@ -69,13 +68,15 @@ async function fetchSchedules(ssid, step = 0, setFetchProgress) {
 
     for (let j = 1; j < 4; j++) {
         //check if setFetchProgress is a function
+
         if (typeof setFetchProgress === 'function') {
             setFetchProgress(prev => ({ ...prev, schedule: prev.schedule + 1 }));
         }
+
         ddTerm = `${j}/${ssid + step}`;
         data = await getScheduleAPI(ddTerm);
         if (data) {
-            console.log(data);
+            // console.log(data);
         } else {
             console.error("Failed to fetch course schedule. ddterm:", ddTerm);
             return
@@ -87,8 +88,7 @@ async function fetchSchedules(ssid, step = 0, setFetchProgress) {
 async function fetchPlans(ssid, step = 0, setFetchProgress) {
     let ddTerm = 1;
     let data = {};
-    const sep = Math.floor(step / 2)
-    console.log("fetch plan. sep:", sep);
+
     for (let j = 1; j < 4; j++) {
         //check if setFetchProgress is a function
         if (typeof setFetchProgress === 'function') {
@@ -96,9 +96,10 @@ async function fetchPlans(ssid, step = 0, setFetchProgress) {
         }
         ddTerm = `${j}/${ssid + step}`;
         console.log("\nfetch plan. ddterm:", ddTerm);
-        data = await getPlanAPI(ddTerm, sep);
+        data = await getPlanAPI(ddTerm);
         if (data) {
-            console.log(data);
+            await insertCourse(data, semester = j, year = `${ssid + step}`);
+            // console.log(data);
         } else {
             console.error("Failed to fetch course plan. ddterm:", ddTerm);
             return
@@ -146,7 +147,7 @@ const courseSchedule_DataExtract = async (strHTML) => {
         });
         tables.push(tableRow);
     });
-    return { tables };
+    return tables;
 }
 
 const examSchedule_DataExtract = (strHTML) => {
@@ -182,6 +183,28 @@ const examSchedule_DataExtract = (strHTML) => {
 //         __VIEWSTATEGENERATOR,
 //     });
 // }
+
+function insertCourse(rows, semester, year) {
+    rows.forEach(row => {
+        try {
+            console.log("Processing plan row:", row);
+            if (row.data.length > 0) {
+                const { data } = row
+                if (!data[1].match(/GE\d*/)) {
+                    //course_Code: data[1], course_name: data[2], course_group: data[3], course_credit: data[4], course_semester: semester, year: year
+                    // console.log("Inserted course:", data[1], data[2], data[3], data[4], semester, year);
+                    Course.insert(data[1], data[2], data[3], data[4], semester, year);
+                } else {
+                    // console.log("GE course found, inserting as GE:", data[1], data[2], data[3], data[4], semester, year);
+                    Course.insert(data[1], "GE", "GE", data[4], semester, year);
+                }
+            }
+        } catch (error) {
+            console.error("Error processing plan row:", error);
+        }
+    });
+
+}
 
 export {
     getScheduleAPI, fetchSchedules,
