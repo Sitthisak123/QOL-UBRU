@@ -50,15 +50,15 @@ export const Grade = {
                 CREATE TABLE IF NOT EXISTS Grade (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Grade TEXT,
-                    CourseID INTEGER,
+                    CourseCode INTEGER,
+                    CourseName TEXT,
                     Semester INTEGER,
                     Year TEXT,
                     Section TEXT,
                     Teacher TEXT,
                     GroupName TEXT,
                     Transferred INTEGER,
-                    Credit INTEGER,
-                    FOREIGN KEY(CourseID) REFERENCES Course(id)
+                    Credit INTEGER
                 );`
             );
         } catch (error) {
@@ -68,7 +68,8 @@ export const Grade = {
 
     insert: async ({
         GradeValue,
-        CourseID,
+        CourseCode,
+        CourseName,
         Semester,
         Year,
         Section,
@@ -79,12 +80,38 @@ export const Grade = {
     }) => {
         try {
             await db.runAsync(
-                `INSERT INTO Grade (Grade, CourseID, Semester, Year, Section, Teacher, GroupName, Transferred, Credit)
+                `INSERT INTO Grade (Grade, CourseCode, CourseName, Semester, Year, Section, Teacher, GroupName, Transferred, Credit)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [GradeValue, CourseID, Semester, Year, Section, Teacher, GroupName, Transferred ? 1 : 0, Credit]
+                [GradeValue, CourseCode, CourseName, Semester, Year, Section, Teacher, GroupName, Transferred ? 1 : 0, Credit]
             );
         } catch (error) {
             console.error("Error inserting grade:", error);
+        }
+    },
+
+    insertMany: async (gradesArray) => {
+        try {
+            for (const item of gradesArray) {
+                await db.runAsync(
+                    `INSERT INTO Grade (Grade, CourseCode, CourseName, Semester, Year, Section, Teacher, GroupName, Transferred, Credit)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [
+                        item.grade,                       // GradeValue
+                        item.subjectCode,                 // CourseCode
+                        item.subjectName ?? item.subjecttName, // CourseName (handle typo)
+                        item.term,                        // Semester (you might split "1/2566")
+                        item.term ? item.term.split("/")[1] : "", // Year
+                        item.section || "",               // Section
+                        item.teacher || "",               // Teacher
+                        item.groupName || "",             // GroupName
+                        item.transferExempt ? 1 : 0,      // Transferred (1 if exempted)
+                        parseInt(item.credits) || 0       // Credit
+                    ]
+                );
+            }
+            console.log(`✅ Inserted ${gradesArray.length} grades`);
+        } catch (error) {
+            console.error("Error inserting multiple grades:", error);
         }
     },
 
@@ -93,14 +120,25 @@ export const Grade = {
             const res = await db.getAllAsync(`
                 SELECT Grade.*, Course.CourseName
                 FROM Grade
-                JOIN Course ON Grade.CourseID = Course.id`
+                JOIN Course ON Grade.CourseCode = Course.id`
             );
             return res;
         } catch (error) {
             console.error("Error fetching grades with course name:", error);
             return false;
         }
+    },
+
+    getAll: async () => {
+        try {
+            const res = await db.getAllAsync(`SELECT * FROM Grade`);
+            return res;
+        } catch (error) {
+            console.error("Error fetching grades:", error);
+            return [];
+        }
     }
+
 };
 
 export const Plan = {
@@ -109,14 +147,13 @@ export const Plan = {
             await db.runAsync(`
                 CREATE TABLE IF NOT EXISTS Plan (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CourseID INTEGER,
+                    CourseCode INTEGER,
                     Semester INTEGER,
                     Year TEXT,
                     Section TEXT,
                     Plan TEXT,
                     GroupName TEXT,
-                    Credit INTEGER,
-                    FOREIGN KEY(CourseID) REFERENCES Course(id)
+                    Credit INTEGER
                 );`
             );
         } catch (error) {
@@ -125,7 +162,7 @@ export const Plan = {
     },
 
     insert: async ({
-        CourseID,
+        CourseCode,
         Semester,
         Year,
         Section,
@@ -135,9 +172,9 @@ export const Plan = {
     }) => {
         try {
             await db.runAsync(
-                `INSERT INTO Plan (CourseID, Semester, Year, Section, Plan, GroupName, Credit)
+                `INSERT INTO Plan (CourseCode, Semester, Year, Section, Plan, GroupName, Credit)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                [CourseID, Semester, Year, Section, PlanValue, GroupName, Credit]
+                [CourseCode, Semester, Year, Section, PlanValue, GroupName, Credit]
             );
         } catch (error) {
             console.error("Error inserting plan:", error);
@@ -149,7 +186,7 @@ export const Plan = {
             const res = await db.getAllAsync(`
                 SELECT Plan.*, Course.CourseName
                 FROM Plan
-                JOIN Course ON Plan.CourseID = Course.id`
+                JOIN Course ON Plan.CourseCode = Course.id`
             );
             return res;
         } catch (error) {
@@ -166,7 +203,7 @@ export const CourseSchedule = {
             await db.runAsync(`
                 CREATE TABLE IF NOT EXISTS CourseSchedule (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CourseID INTEGER,
+                    CourseCode INTEGER,
                     Semester INTEGER,
                     Year TEXT,
                     Section TEXT,
@@ -174,8 +211,7 @@ export const CourseSchedule = {
                     ScheduleDate TEXT,
                     ScheduleTime TEXT,
                     Phone TEXT,
-                    Email TEXT,
-                    FOREIGN KEY(CourseID) REFERENCES Course(id)
+                    Email TEXT
                 );`
             );
         } catch (error) {
@@ -184,22 +220,12 @@ export const CourseSchedule = {
 
     },
 
-    insert: async ({
-        CourseID,
-        Semester,
-        Year,
-        Section,
-        ClassRoom,
-        ScheduleDate,
-        ScheduleTime,
-        Phone,
-        Email
-    }) => {
+    insert: async ({ CourseCode, Semester, Year, Section, ClassRoom, ScheduleDate, ScheduleTime, Phone, Email }) => {
         try {
             await db.runAsync(
-                `INSERT INTO CourseSchedule (CourseID, Semester, Year, Section, ClassRoom, ScheduleDate, ScheduleTime, Phone, Email)
+                `INSERT INTO CourseSchedule (CourseCode, Semester, Year, Section, ClassRoom, ScheduleDate, ScheduleTime, Phone, Email)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [CourseID, Semester, Year, Section, ClassRoom, ScheduleDate, ScheduleTime, Phone, Email]
+                [CourseCode, Semester, Year, Section, ClassRoom, ScheduleDate, ScheduleTime, Phone, Email]
             );
         } catch (error) {
             console.error("Error inserting course schedule:", error);
@@ -212,7 +238,7 @@ export const CourseSchedule = {
             const res = await db.getAllAsync(`
                 SELECT CourseSchedule.*, Course.CourseName
                 FROM CourseSchedule
-                JOIN Course ON CourseSchedule.CourseID = Course.id
+                JOIN Course ON CourseSchedule.CourseCode = Course.id
             `);
             return res;
         } catch (error) {
@@ -266,6 +292,6 @@ FOR EACH ROW
 BEGIN
   UPDATE Plan
   SET CourseName = NEW.CourseName
-  WHERE CourseID = NEW.id;
+  WHERE CourseCode = NEW.id;
 END;
 */

@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { useEffect, useState } from 'react';
 import { ProgressBar, useTheme } from 'react-native-paper';
-const { fetchSchedules, fetchExamSchedules, fetchPlans } = require('../utils/api');
+const { fetchSchedules, fetchExamSchedules, fetchPlans, fetchGrades } = require('../utils/api');
 import { asyncStorage_getItem } from '../utils/db/AsyncStorage';
 import { useUserInfo } from '../utils/store/useStore';
 import { router } from "expo-router";
@@ -10,9 +10,9 @@ import { resetDB } from '../utils/db/SQLite';
 function init() {
     const theme = useTheme();
     const textUser = useUserInfo((state) => state.USER_info.textUser);
-    const [fecthProgress, setFetchProgress] = useState({ plan: 0, schedule: 0, ExamSchedule: 0, result: 0 });
-    const taltolFecthtask = { plan: 12, schedule: 9, ExamSchedule: 10, result: 1 };
-    const [isProgressing, setIsProgress] = useState({ plan: false, schedule: false, ExamSchedule: false, result: false });
+    const [fecthProgress, setFetchProgress] = useState({ plan: 0, schedule: 0, ExamSchedule: 0, grade: 0 });
+    const taltolFecthtask = { plan: 12, schedule: 9, ExamSchedule: 10, grade: 1 };
+    const [isProgressing, setIsProgress] = useState({ plan: false, schedule: false, ExamSchedule: false, grade: false });
 
     const customStyles = StyleSheet.create({
         view: {
@@ -69,7 +69,7 @@ function init() {
         const firstTwoSSID = parseInt(textUser.slice(0, 2))
         const learnedYear = Math.abs(firstTwoSSID - (new Date().getFullYear() + 543) % 100);
         await resetDB();
-        
+
         // //Step 1: Fetch course schedule
         // setIsProgress(prev => ({ ...prev, schedule: true }));
         // for (let i = 0; i < learnedYear + 1; i++) {
@@ -77,12 +77,12 @@ function init() {
         //     await new Promise(resolve => setTimeout(resolve, 550));
         // }
 
-        //step 2: Fetch plan
-        setIsProgress(prev => ({ ...prev, plan: true }));
-        for (let i = 0; i < 4; i++) {
-            await fetchPlans(firstTwoSSID, i, setFetchProgress);
-            await new Promise(resolve => setTimeout(resolve, 550));
-        }
+        // //step 2: Fetch plan
+        // setIsProgress(prev => ({ ...prev, plan: true }));
+        // for (let i = 0; i < 4; i++) {
+        //     await fetchPlans(firstTwoSSID, i, setFetchProgress);
+        //     await new Promise(resolve => setTimeout(resolve, 550));
+        // }
 
         // //step 3: Fetch exam schedule
         // setIsProgress(prev => ({ ...prev, ExamSchedule: true }));
@@ -90,6 +90,10 @@ function init() {
         //     await fetchExamSchedules(firstTwoSSID, i, setFetchProgress);
         //     await new Promise(resolve => setTimeout(resolve, 550));
         // }
+
+        //step 4: Fetch Grades
+        setIsProgress(prev => ({ ...prev, grade: true }));
+        await fetchGrades(firstTwoSSID, setFetchProgress);
 
         router.replace("home", { relativeToDirectory: true });
     }
@@ -123,8 +127,9 @@ function init() {
                 {isProgressing.ExamSchedule && <Text id={"ExamSchedule"} style={customStyles.subText} >ตารางสอบนักศึกษา</Text>}
                 <ProgressBar progress={calculateProgress(fecthProgress.ExamSchedule, taltolFecthtask.ExamSchedule)} visible={isProgressing.ExamSchedule} color={theme.colors.primary} />
 
-                {/* <Text id={"result"} style={customStyles.subText} >ตรวจสอบผลการเรียน</Text>
-                <ProgressBar progress={fecthProgress.result.completed / fecthProgress.result.task} visible={isProgressing.result} color={theme.colors.primary} /> */}
+                {isProgressing.grade && <Text id={"grade"} style={customStyles.subText} >ตรวจสอบผลการเรียน</Text>}
+                <ProgressBar progress={calculateProgress(fecthProgress.grade, taltolFecthtask.grade)} visible={isProgressing.grade} color={theme.colors.primary} />
+
                 {/* <Text id={"courseReg"} style={customStyles.subText} >ข้อมูลการจองรายวิชา</Text>
                 <ProgressBar progress={.5} visible={false} color={theme.colors.primary} /> */}
 
