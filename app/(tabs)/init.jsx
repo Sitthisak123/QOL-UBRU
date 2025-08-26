@@ -70,33 +70,33 @@ function init() {
         const learnedYear = Math.abs(firstTwoSSID - (new Date().getFullYear() + 543) % 100);
         await resetDB();
 
-        //Step 1: Fetch course schedule
-        setIsProgress(prev => ({ ...prev, schedule: true }));
-        for (let i = 0; i < learnedYear + 1; i++) {
-            await fetchSchedules(firstTwoSSID, i, setFetchProgress);
-            await new Promise(resolve => setTimeout(resolve, 550));
-        }
+        // //Step 1: Fetch Schedule Tables
+        // setIsProgress(prev => ({ ...prev, schedule: true }));
+        // for (let i = 0; i < learnedYear + 1; i++) {
+        //     await fetchSchedules(firstTwoSSID, i, setFetchProgress);
+        //     await new Promise(resolve => setTimeout(resolve, 550));
+        // }
 
-        //step 2: Fetch plan
-        setIsProgress(prev => ({ ...prev, plan: true }));
-        for (let i = 0; i < 4; i++) {
-            await fetchPlans(firstTwoSSID, i, setFetchProgress);
-            await new Promise(resolve => setTimeout(resolve, 550));
-        }
+        // //step 2: Fetch plans
+        // setIsProgress(prev => ({ ...prev, plan: true }));
+        // for (let i = 0; i < 4; i++) {
+        //     await fetchPlans(firstTwoSSID, i, setFetchProgress);
+        //     await new Promise(resolve => setTimeout(resolve, 550));
+        // }
 
-        //step 3: Fetch exam schedule
+        //step 3: Fetch exam schedules
         setIsProgress(prev => ({ ...prev, ExamSchedule: true }));
         for (let i = 0; i < learnedYear + 1; i++) {
             await fetchExamSchedules(firstTwoSSID, i, setFetchProgress);
             await new Promise(resolve => setTimeout(resolve, 550));
         }
 
-        //step 4: Fetch Grades
-        setIsProgress(prev => ({ ...prev, grade: true }));
-        setFetchProgress(prev => ({ ...prev, grade: prev.grade + 1 }));
-        await fetchGrades(firstTwoSSID, setFetchProgress);
+        // //step 4: Fetch Grades
+        // setIsProgress(prev => ({ ...prev, grade: true }));
+        // setFetchProgress(prev => ({ ...prev, grade: prev.grade + 1 }));
+        // await fetchGrades(firstTwoSSID, setFetchProgress);
 
-        await new Promise(resolve => setTimeout(resolve, 3550));
+        // await new Promise(resolve => setTimeout(resolve, 3550));
 
         router.replace("home", { relativeToDirectory: true });
     }

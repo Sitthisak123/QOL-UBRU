@@ -7,7 +7,7 @@ import { asyncStorage_setItem } from "../utils/db/AsyncStorage";
 import { router } from "expo-router";
 import { useUserInfo } from "../utils/store/useStore";
 
-import { resetDB, Course, Grade } from "../utils/db/SQLite";
+import { resetDB, Course, Grade, ExamSchedule } from "../utils/db/SQLite";
 import { getPlanAPI } from "../utils/api";
 export default function Auth() {
   const maxSTDID = 11 //char limit for student ID
@@ -50,12 +50,12 @@ export default function Auth() {
 
   const test2 = async () => {
     // await resetDB();
-    // getPlanAPI('1/66');
+    console.log("reseted DB")
 
-    // const res = await Course.getAll();
-    // for (const row of res) {
-    //   console.log(row.id, row.CourseCode, row.CourseName, row.GroupName, row.Credits, row.Semester, row.Year);
-    // }
+    const res = await ExamSchedule.getAll();
+    for (const row of res) {
+      console.log(row.id, row.CourseCode, row.CourseName, row.Credit, row.Semester, row.Year);
+    }
 
   //   const grRes = await Grade.getAll();
   //   for (const row of grRes) {

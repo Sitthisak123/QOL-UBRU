@@ -1,6 +1,6 @@
 import axios from 'axios';
 import cheerio from 'react-native-cheerio';
-import { Course, Grade } from './db/SQLite';
+import { Course, Grade, CourseSchedule, ExamSchedule } from './db/SQLite';
 const { asyncStorage_getItem } = require('../utils/db/AsyncStorage');
 
 async function getScheduleAPI(ddTerm) {
@@ -76,6 +76,7 @@ async function fetchSchedules(ssid, step = 0, setFetchProgress) {
         ddTerm = `${j}/${ssid + step}`;
         data = await getScheduleAPI(ddTerm);
         if (data) {
+            insertSchedule(data, semester = j, year = `${ssid + step}`)
             // console.log(data);
         } else {
             console.error("Failed to fetch course schedule. ddterm:", ddTerm);
@@ -99,7 +100,6 @@ async function fetchPlans(ssid, step = 0, setFetchProgress) {
         data = await getPlanAPI(ddTerm);
         if (data) {
             await insertCourse(data, semester = j, year = `${ssid + step}`);
-            // console.log(data);
         } else {
             console.error("Failed to fetch course plan. ddterm:", ddTerm);
             return
@@ -117,12 +117,11 @@ async function fetchExamSchedules(ssid, step = 0, setFetchProgress) {
         if (typeof setFetchProgress === 'function') {
             setFetchProgress(prev => ({ ...prev, ExamSchedule: prev.ExamSchedule + 1 }));
         }
-
         ddTerm = `${j}/${ssid + step}`;
         // console.log("fetch exam schedule. ddterm:", ddTerm);
         data = await getExamScheduleAPI(ddTerm);
         if (data) {
-            console.log(data);
+            insertExamSchedule(data, semester = j, year = `${ssid + step}`)
         } else {
             console.error("Failed to fetch exam schedule. ddterm:", ddTerm);
             continue
@@ -217,6 +216,44 @@ function insertCourse(rows, semester, year) {
                     // console.log("GE course found, inserting as GE:", data[1], data[2], data[3], data[4], semester, year);
                     Course.insert(data[1], "GE", "GE", data[4], semester, year);
                 }
+            }
+        } catch (error) {
+            console.error("Error processing plan row:", error);
+        }
+    });
+}
+function insertSchedule(rows, semester, year) {
+    rows.forEach(row => {
+        try {
+            if (row.data.length > 0) {
+                const { data } = row
+                //["1", "4183404", "การประมวลผลภาพดิจิทั  ล", "03", "3(2-2-5)", "ชัยวิชิต  แก้วกลม", "30-303", "อ(13.50 - 17.10)", "-","-", "08 6653 7013", "chaivichit.k@ubru.ac.th"]
+                //0: NO, 1: Code, 2: Name, 3: Sect, 4: FullCredits, 5: Teacher, 6: ClassRoom, 7: scheduleTime, 8: ?, 9: ?, 10: Phone, 11: Email
+                const ScheduleTime = data[7].trim() //อ(13.50 - 17.10)
+                const scdDate = ScheduleTime.replace(/\(.*?\)/g, ""); //อ
+                const scdTime = ScheduleTime.replace(/.*\((.*?)\).*/, "$1").replace(/\s+/g, "");//13.50-17.10
+                // console.log("processing insert scdTable:")
+                // console.log(data[1], data[2], data[3], data[4], data[5], data[6], scdDate, scdTime, data[10], data[11], semester, year)
+                CourseSchedule.insert(data[1], data[2], data[3], data[4], data[5], data[6], scdDate, scdTime, data[10], data[11], semester, year);
+            }
+        } catch (error) {
+            console.error("Error processing plan row:", error);
+        }
+    });
+}
+function insertExamSchedule(rows, semester, year) {
+    rows.forEach(row => {
+        try {
+            if (row.data.length > 0) {
+                const { data } = row
+                //["3", "4183901", "สัมมนาด้านวิทยาการคอมพิวเตอร์", "01", "1(0-3-6)", "30-217", "-", "8    8.00 - 10.00", "28 ต.ค.68", "8.00 - 10.00"]
+                //["2", "4183501", "สถาปัตยกรรมคอมพิวเตอร์", "03", "3(3-0-6)", "30-407", "-", "10.30 -    12.30", "27 ต.ค.68", "10.30 - 12.30"]
+                //0: NO, 1: Code, 2: Name, 3: Sect, 4: Credit, 5: ClassRoom, 6: ?, 7: midTime, 8: FinalDate, 9: FinalTime 
+
+                const midSCDTime = data[7].replace(/\s+/g, "");     //10.30 -    12.30   >          10.30-12.30
+                const finalSCDTime = data[9].replace(/\s+/g, "");   //10.30 - 12.30      >          10.30-12.30
+
+                ExamSchedule.insert(data[1], data[2], data[3], data[4], data[5], midSCDTime, data[8], finalSCDTime, semester, year);
             }
         } catch (error) {
             console.error("Error processing plan row:", error);

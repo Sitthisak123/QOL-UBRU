@@ -13,7 +13,7 @@ export const Course = {
                     GroupName TEXT,
                     Semester INTEGER,
                     Year TEXT,
-                    Credits INTEGER
+                    Credit INTEGER
                 );`
             );
         } catch (error) {
@@ -22,10 +22,10 @@ export const Course = {
 
     },
 
-    insert: async (CourseCode, CourseName, GroupName, Credits, Semester, Year) => {
+    insert: async (CourseCode, CourseName, GroupName, Credit, Semester, Year) => {
         try {
             await db.runAsync(
-                `INSERT INTO Course (CourseCode, CourseName, GroupName, Credits, Semester, Year) VALUES (?, ?, ?, ?, ?, ?)`, CourseCode, CourseName, GroupName, Credits, Semester, Year
+                `INSERT INTO Course (CourseCode, CourseName, GroupName, Credit, Semester, Year) VALUES (?, ?, ?, ?, ?, ?)`, CourseCode, CourseName, GroupName, Credit, Semester, Year
             );
         } catch (error) {
             console.error("Error inserting course:", error);
@@ -50,7 +50,7 @@ export const Grade = {
                 CREATE TABLE IF NOT EXISTS Grade (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Grade TEXT,
-                    CourseCode INTEGER,
+                    CourseCode TEXT,
                     CourseName TEXT,
                     Semester INTEGER,
                     Year TEXT,
@@ -147,7 +147,7 @@ export const Plan = {
             await db.runAsync(`
                 CREATE TABLE IF NOT EXISTS Plan (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CourseCode INTEGER,
+                    CourseCode TEXT,
                     Semester INTEGER,
                     Year TEXT,
                     Section TEXT,
@@ -179,21 +179,6 @@ export const Plan = {
         } catch (error) {
             console.error("Error inserting plan:", error);
         }
-    },
-
-    getAllWithCourseName: async () => {
-        try {
-            const res = await db.getAllAsync(`
-                SELECT Plan.*, Course.CourseName
-                FROM Plan
-                JOIN Course ON Plan.CourseCode = Course.id`
-            );
-            return res;
-        } catch (error) {
-            console.error("Error fetching plans with course name:", error);
-            return false;
-        }
-
     }
 };
 
@@ -203,15 +188,18 @@ export const CourseSchedule = {
             await db.runAsync(`
                 CREATE TABLE IF NOT EXISTS CourseSchedule (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CourseCode INTEGER,
-                    Semester INTEGER,
-                    Year TEXT,
+                    CourseCode TEXT,
+                    CourseName TEXT,
                     Section TEXT,
+                    Credit TEXT,
+                    Teacher TEXT,
                     ClassRoom TEXT,
-                    ScheduleDate TEXT,
                     ScheduleTime TEXT,
+                    ScheduleDate TEXT,
                     Phone TEXT,
-                    Email TEXT
+                    Email TEXT,
+                    Semester INTEGER,
+                    Year TEXT
                 );`
             );
         } catch (error) {
@@ -220,12 +208,12 @@ export const CourseSchedule = {
 
     },
 
-    insert: async ({ CourseCode, Semester, Year, Section, ClassRoom, ScheduleDate, ScheduleTime, Phone, Email }) => {
+    insert: async (CourseCode, CourseName, Section, Credit, Teacher, ClassRoom, ScheduleTime, ScheduleDate, Phone, Email, Semester, Year) => {
         try {
+
             await db.runAsync(
-                `INSERT INTO CourseSchedule (CourseCode, Semester, Year, Section, ClassRoom, ScheduleDate, ScheduleTime, Phone, Email)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [CourseCode, Semester, Year, Section, ClassRoom, ScheduleDate, ScheduleTime, Phone, Email]
+                `INSERT INTO CourseSchedule (CourseCode, CourseName, Section, Credit, Teacher, ClassRoom, ScheduleTime, ScheduleDate, Phone, Email, Semester, Year)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, CourseCode, CourseName, Section, Credit, Teacher, ClassRoom, ScheduleTime, ScheduleDate, Phone, Email, Semester, Year
             );
         } catch (error) {
             console.error("Error inserting course schedule:", error);
@@ -233,21 +221,65 @@ export const CourseSchedule = {
 
     },
 
-    getAllWithCourseName: async () => {
+    getAll: async () => {
         try {
-            const res = await db.getAllAsync(`
-                SELECT CourseSchedule.*, Course.CourseName
-                FROM CourseSchedule
-                JOIN Course ON CourseSchedule.CourseCode = Course.id
-            `);
+            const res = await db.getAllAsync(`SELECT * FROM CourseSchedule`);
             return res;
         } catch (error) {
-            console.error("Error fetching course schedules with course name:", error);
+            console.error("Error fetching course schedules:", error);
             return false;
         }
 
-    }
+    },
 };
+
+export const ExamSchedule = {
+    createTable: async () => {
+        try {
+            await db.runAsync(`
+                CREATE TABLE IF NOT EXISTS ExamSchedule (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CourseCode TEXT,
+                    CourseName TEXT,
+                    Section TEXT,
+                    Credit TEXT,
+                    ClassRoom TEXT,
+                    MidScheduleTime TEXT,
+                    FinalScheduleDate TEXT,
+                    FinalScheduleTime TEXT,
+                    Semester INTEGER,
+                    Year TEXT
+                );`
+            );
+        } catch (error) {
+            console.error("Error creating ExamSchedule table:", error);
+        }
+    },
+    insert: async (CourseCode, CourseName, Section, Credit, ClassRoom, MidScheduleTime, FinalScheduleDate, FinalScheduleTime, Semester, Year) => {
+        try {
+            console.log("insert ExamSCD: ", Year)
+
+            await db.runAsync(
+                `INSERT INTO ExamSchedule (CourseCode, CourseName, Section, Credit, ClassRoom, MidScheduleTime, FinalScheduleDate, FinalScheduleTime, Semester, Year)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, CourseCode, CourseName, Section, Credit, ClassRoom, MidScheduleTime, FinalScheduleDate, FinalScheduleTime, Semester, Year
+            );
+        } catch (error) {
+            console.error("Error creating Grade table:", error);
+        }
+    },
+    getAll: async () => {
+        try {
+            const res = await db.getAllAsync(`SELECT * FROM ExamSchedule`);
+            return res;
+        } catch (error) {
+            console.error("Error fetching ExamSchedule:", error);
+            return false;
+        }
+
+    },
+
+
+}
 
 
 export const initDB = async () => {
@@ -258,6 +290,7 @@ export const initDB = async () => {
         await Grade.createTable();
         await Plan.createTable();
         await CourseSchedule.createTable();
+        await ExamSchedule.createTable();
 
     } catch (error) {
         console.error("Error initializing database:", error);
@@ -273,6 +306,7 @@ export const resetDB = async () => {
         await db.runAsync(`DROP TABLE IF EXISTS Plan;`);
         await db.runAsync(`DROP TABLE IF EXISTS CourseSchedule;`);
         await db.runAsync(`DROP TABLE IF EXISTS Course;`);
+        await db.runAsync(`DROP TABLE IF EXISTS ExamSchedule;`);
 
         // Recreate tables
         await initDB();
