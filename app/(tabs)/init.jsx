@@ -1,11 +1,11 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { useEffect, useState } from 'react';
 import { ProgressBar, useTheme } from 'react-native-paper';
-const { fetchSchedules, fetchExamSchedules, fetchPlans, fetchGrades } = require('../utils/api');
-import { asyncStorage_getItem } from '../utils/db/AsyncStorage';
-import { useUserInfo } from '../utils/store/useStore';
+import { fetchSchedules, fetchExamSchedules, fetchPlans, fetchGrades } from "../../utils/api.js"
+import { asyncStorage_getItem } from '../../utils/db/AsyncStorage';
+import { useUserInfo } from '../../utils/store/useStore';
 import { router } from "expo-router";
-import { resetDB } from '../utils/db/SQLite';
+import { resetDB } from '../../utils/db/SQLite';
 
 function init() {
     const theme = useTheme();
@@ -70,19 +70,19 @@ function init() {
         const learnedYear = Math.abs(firstTwoSSID - (new Date().getFullYear() + 543) % 100);
         await resetDB();
 
-        // //Step 1: Fetch Schedule Tables
-        // setIsProgress(prev => ({ ...prev, schedule: true }));
-        // for (let i = 0; i < learnedYear + 1; i++) {
-        //     await fetchSchedules(firstTwoSSID, i, setFetchProgress);
-        //     await new Promise(resolve => setTimeout(resolve, 550));
-        // }
+        //Step 1: Fetch Schedule Tables
+        setIsProgress(prev => ({ ...prev, schedule: true }));
+        for (let i = 0; i < learnedYear + 1; i++) {
+            await fetchSchedules(firstTwoSSID, i, setFetchProgress);
+            await new Promise(resolve => setTimeout(resolve, 550));
+        }
 
-        // //step 2: Fetch plans
-        // setIsProgress(prev => ({ ...prev, plan: true }));
-        // for (let i = 0; i < 4; i++) {
-        //     await fetchPlans(firstTwoSSID, i, setFetchProgress);
-        //     await new Promise(resolve => setTimeout(resolve, 550));
-        // }
+        //step 2: Fetch plans
+        setIsProgress(prev => ({ ...prev, plan: true }));
+        for (let i = 0; i < 4; i++) {
+            await fetchPlans(firstTwoSSID, i, setFetchProgress);
+            await new Promise(resolve => setTimeout(resolve, 550));
+        }
 
         //step 3: Fetch exam schedules
         setIsProgress(prev => ({ ...prev, ExamSchedule: true }));
@@ -91,10 +91,10 @@ function init() {
             await new Promise(resolve => setTimeout(resolve, 550));
         }
 
-        // //step 4: Fetch Grades
-        // setIsProgress(prev => ({ ...prev, grade: true }));
-        // setFetchProgress(prev => ({ ...prev, grade: prev.grade + 1 }));
-        // await fetchGrades(firstTwoSSID, setFetchProgress);
+        //step 4: Fetch Grades
+        setIsProgress(prev => ({ ...prev, grade: true }));
+        setFetchProgress(prev => ({ ...prev, grade: prev.grade + 1 }));
+        await fetchGrades(firstTwoSSID, setFetchProgress);
 
         // await new Promise(resolve => setTimeout(resolve, 3550));
 

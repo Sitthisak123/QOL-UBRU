@@ -2,10 +2,10 @@ import { useEffect, useState, useCallback, useLayoutEffect } from "react";
 import { View, AppState } from "react-native";
 import { router } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { asyncStorage_getItem } from "./utils/db/AsyncStorage";
+import { asyncStorage_getItem } from "../utils/db/AsyncStorage";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { useUserInfo } from "./utils/store/useStore";
-import { initDB } from './utils/db/SQLite';
+import { useUserInfo } from "../utils/store/useStore";
+import { initDB } from '../utils/db/SQLite';
 
 
 export default function Index() {
@@ -16,6 +16,12 @@ export default function Index() {
   const onResume = () => {
     // router.replace("auth", { relativeToDirectory: true });
   }
+
+  //DEV 
+  function onStart(){
+    router.replace("academic_statistics", { relativeToDirectory: true });
+  }
+  //DEV 
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', nextAppState => {
@@ -38,8 +44,9 @@ export default function Index() {
       const SSID = await asyncStorage_getItem('SSID')
       const userInfo = await asyncStorage_getItem('USER')
       if ((SSID && userInfo)) {
-        setLogin({ SSID, textUser: userInfo.textUser, });
-        router.replace("home", { relativeToDirectory: true });
+        setLogin({ SSID, textUser: userInfo.textUser, Name: 'Unvailable:1'});
+        // router.replace("home", { relativeToDirectory: true });
+        onStart();
       } else {
         router.replace("auth", { relativeToDirectory: true });
       }

@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { Text, TextInput, useTheme, Button } from 'react-native-paper';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, BackHandler, TouchableWithoutFeedback, Platform } from "react-native";
-import { asyncStorage_setItem } from "../utils/db/AsyncStorage";
+import { asyncStorage_setItem } from "../../utils/db/AsyncStorage";
 import { router } from "expo-router";
-import { useUserInfo } from "../utils/store/useStore";
+import { useUserInfo } from "../../utils/store/useStore";
 
-import { resetDB, Course, Grade, ExamSchedule } from "../utils/db/SQLite";
-import { getPlanAPI } from "../utils/api";
+import { resetDB, Course, Grade, ExamSchedule } from "../../utils/db/SQLite";
+import { getPlanAPI } from "../../utils/api";
 export default function Auth() {
   const maxSTDID = 11 //char limit for student ID
   const [text, setText] = useState('')
@@ -98,7 +98,7 @@ export default function Auth() {
       console.log("response Status: ", response.status);
       await asyncStorage_setItem('SSID', SSID);
       await asyncStorage_setItem('USER', { textUser: dataInput.STDID, txtPass: dataInput.pass });
-      setLogin({ SSID, textUser: dataInput.STDID });
+      setLogin({ SSID, textUser: dataInput.STDID, Name: 'Unvailable:2' });
       setIsLoading(false);
       router.replace("/init");
     } catch (error) {
