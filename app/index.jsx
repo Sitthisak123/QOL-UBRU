@@ -46,7 +46,7 @@ export default function Index() {
       if ((SSID && userInfo)) {
         setLogin({ SSID, textUser: userInfo.textUser, Name: 'Unvailable:1'});
         // router.replace("home", { relativeToDirectory: true });
-        onStart();
+        onStart(); //DEV
       } else {
         router.replace("auth", { relativeToDirectory: true });
       }

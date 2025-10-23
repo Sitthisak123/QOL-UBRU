@@ -61,7 +61,7 @@ function init() {
         // useUserInfo.getState().login({...useUserInfo.getState().USER_info, textUser: ""});
         useUserInfo.getState().logout();
         console.log("User logged out");
-        console.log(useUserInfo.getState().USER_info)
+        // console.log(useUserInfo.getState().USER_info)
     }
 
     async function initializeFecthingData() {
@@ -77,7 +77,7 @@ function init() {
             await new Promise(resolve => setTimeout(resolve, 550));
         }
 
-        //step 2: Fetch plans
+        //step 2: Fetch plans|Courses
         setIsProgress(prev => ({ ...prev, plan: true }));
         for (let i = 0; i < 4; i++) {
             await fetchPlans(firstTwoSSID, i, setFetchProgress);
