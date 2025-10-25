@@ -29,6 +29,10 @@ export const globalCustomStyles = (theme) => ({
     color: theme.colors.text,
     backgroundColor: 'transparent'
   },
+  dataFieldCenter: {
+    alignItems: "center", 
+    justifyContent: "center"
+  }
 });
 
 
