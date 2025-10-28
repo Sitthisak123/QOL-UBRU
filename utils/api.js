@@ -65,6 +65,8 @@ async function getExamScheduleAPI(ddTerm) {
 async function fetchSchedules(ssid, step = 0, setFetchProgress) {
     let ddTerm = 1;
     let data = {};
+    const currentBE = (new Date().getFullYear() + 543)
+    const currentBEPrefix = currentBE.toString().slice(0, 2);
 
     for (let j = 1; j < 4; j++) {
         //check if setFetchProgress is a function
@@ -76,7 +78,7 @@ async function fetchSchedules(ssid, step = 0, setFetchProgress) {
         ddTerm = `${j}/${ssid + step}`;
         data = await getScheduleAPI(ddTerm);
         if (data) {
-            insertSchedule(data, semester = j, year = `${ssid + step}`)
+            insertSchedule(data, semester = j, year = `${currentBEPrefix}${ssid + step}`);
             // console.log(data);
         } else {
             console.error("Failed to fetch course schedule. ddterm:", ddTerm);
@@ -89,6 +91,8 @@ async function fetchSchedules(ssid, step = 0, setFetchProgress) {
 async function fetchPlans(ssid, step = 0, setFetchProgress) {
     let ddTerm = 1;
     let data = {};
+    const currentBE = (new Date().getFullYear() + 543)
+    const currentBEPrefix = currentBE.toString().slice(0, 2);
 
     for (let j = 1; j < 4; j++) {
         //check if setFetchProgress is a function
@@ -99,7 +103,8 @@ async function fetchPlans(ssid, step = 0, setFetchProgress) {
         console.log("\nfetch plan. ddterm:", ddTerm);
         data = await getPlanAPI(ddTerm);
         if (data) {
-            await insertCourse(data, semester = j, year = `${ssid + step}`);
+
+            await insertCourse(data, semester = j, year = `${currentBEPrefix}${ssid + step}`);
         } else {
             console.error("Failed to fetch course plan. ddterm:", ddTerm);
             return
@@ -208,13 +213,13 @@ function insertCourse(rows, semester, year) {
             console.log("Processing plan row:", row);
             if (row.data.length > 0) {
                 const { data } = row
-                if (!data[1].match(/GE\d*/)) {
+                if (data[1].match(/GE\d*/)) {
+                    // console.log("GE course found, inserting as GE:", data[1], data[2], data[3], data[4], semester, year);
+                    Course.insert(data[1], "GE", "GE", data[4], semester, year);
+                } else {
                     //course_Code: data[1], course_name: data[2], course_group: data[3], course_credit: data[4], course_semester: semester, year: year
                     // console.log("Inserted course:", data[1], data[2], data[3], data[4], semester, year);
                     Course.insert(data[1], data[2], data[3], data[4], semester, year);
-                } else {
-                    // console.log("GE course found, inserting as GE:", data[1], data[2], data[3], data[4], semester, year);
-                    Course.insert(data[1], "GE", "GE", data[4], semester, year);
                 }
             }
         } catch (error) {

@@ -131,8 +131,8 @@ export const Grade = {
                         item.grade,                       // GradeValue
                         item.subjectCode,                 // CourseCode
                         item.subjectName ?? item.subjecttName, // CourseName (handle typo)
-                        item.term,                        // Semester (you might split "1/2566")
-                        item.term ? item.term.split("/")[1] : "", // Year
+                        item.term ? item.term.split("/")[0] : "", // Semester "1/2566" = 1
+                        item.term ? item.term.split("/")[1] : "", // Year "1/2566" = 2566
                         item.section || "",               // Section
                         item.teacher || "",               // Teacher
                         item.groupName || "",             // GroupName
@@ -226,7 +226,7 @@ export const Plan = {
                     Section TEXT,
                     Plan TEXT,
                     GroupName TEXT,
-                    Credit INTEGER
+                    Credit TEXT
                 );`
             );
         } catch (error) {
@@ -286,7 +286,7 @@ export const CourseSchedule = {
 
             await db.runAsync(
                 `INSERT INTO CourseSchedule (CourseCode, CourseName, Section, Credit, Teacher, ClassRoom, ScheduleTime, ScheduleDate, Phone, Email, Semester, Year)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, CourseCode, CourseName, Section, Credit, Teacher, ClassRoom, ScheduleTime, ScheduleDate, Phone, Email, Semester, Year
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, CourseCode, CourseName, Section, Credit.slice(0, 1), Teacher, ClassRoom, ScheduleTime, ScheduleDate, Phone, Email, Semester, Year
             );
         } catch (error) {
             console.error("Error inserting course schedule:", error);

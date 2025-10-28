@@ -52,13 +52,13 @@ export default function CourseTable({ dataArray = [], color = "#6200ee", propSty
                         {item.CourseName}
                     </DataTable.Cell>
                     <DataTable.Cell key={"dtc-Semester"} style={[defaultHeaders.Semester, globalStyles.dataFieldCenter]}>
-                        {item.Semester}
+                        {`${item.Semester}/${item.Year}`}
                     </DataTable.Cell>
                     <DataTable.Cell key={"dtc-Credit"} style={[defaultHeaders.Credit, globalStyles.dataFieldCenter]}>
                         {item.Credit}
                     </DataTable.Cell>
                     <DataTable.Cell key={"dtc-Grade"} style={[defaultHeaders.Grade, globalStyles.dataFieldCenter]}>
-                        {item.Grade}
+                        {item.Grade || "-"}
                     </DataTable.Cell>
                 </DataTable.Row>
             ))}

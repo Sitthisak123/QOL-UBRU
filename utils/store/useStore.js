@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Course, Grade, Medthods } from "../db/SQLite";
+import { Course, Grade, CourseSchedule, Medthods } from "../db/SQLite";
 import { countCredits } from "../methods";
 import { GEGroupName } from "../globalVar";
 
@@ -42,8 +42,12 @@ const useAcademicStore = create((set, get) => ({
   // --- core data ---
   courses: [],
   grades: [],
-  coursesNotInGradeOrSchedule: [],
+  courseSchedule: [],
 
+  // --- filtered ---
+  coursesNotInGradeOrSchedule: [],
+  gradesIncomplete: [], //not in Grade and in courseSchedule
+  
 
   // --- credit summaries ---
   maxCountCredits: {},
@@ -67,17 +71,30 @@ const useAcademicStore = create((set, get) => ({
   // ========== 🔄 ACTIONS ==========
   initData: async () => {
     set({ isLoading: true });
-    const [courses, grades, maxCountCredits, totalCredits, coursesNotInGradeOrSchedule] = await Promise.all([
+    const [
+      courses, 
+      grades, 
+      courseSchedule,
+
+      maxCountCredits, 
+      totalCredits, 
+      coursesNotInGradeOrSchedule, 
+    ] = await Promise.all([
+
       Course.getAll(),
       Grade.getAll(),
+      CourseSchedule.getAll(),
+
       Course.countTotalCredits(),
       Grade.countTotalCredits(),
       Medthods.findCoursesNotInGradeOrSchedule(),
+
     ]);
 
-    set({ courses, grades, maxCountCredits, totalCredits, coursesNotInGradeOrSchedule });
+    set({ courses, grades, maxCountCredits, totalCredits, coursesNotInGradeOrSchedule,  courseSchedule });
     get().updateGroupings();
     get().updateGPA();
+    get().updateGradesIncomplete();
     set({ isLoading: false });
   },
 
@@ -112,6 +129,27 @@ const useAcademicStore = create((set, get) => ({
       groupedTotalCreditsMJ,
     });
   },
+
+  updateGradesIncomplete: () => {
+  const { courseSchedule, grades } = get();
+
+  if (!Array.isArray(courseSchedule) || !Array.isArray(grades)) {
+    console.warn("Invalid data in updateGradesIncomplete");
+    return;
+  }
+  // collect all CourseCode that already have grades
+  const gradedCodes = new Set(
+  grades
+    .map(g => g.CourseCode)
+);
+
+  // filter from courseSchedule those not yet graded
+  const gradesIncomplete = courseSchedule.filter(
+    (course) => !gradedCodes.has(course.CourseCode)
+  );
+
+  set({ gradesIncomplete });
+},
 
   /** 🎓 GPA CALCULATION */
   updateGPA: () => {
