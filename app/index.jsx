@@ -18,7 +18,7 @@ export default function Index() {
   }
 
   //DEV 
-  function onStart(){
+  function onStart() {
     router.replace("academic_statistics", { relativeToDirectory: true });
   }
   //DEV 
@@ -40,11 +40,11 @@ export default function Index() {
       } catch (error) {
         console.error("Error initializing database:", error);
       }
-      
+
       const SSID = await asyncStorage_getItem('SSID')
       const userInfo = await asyncStorage_getItem('USER')
       if ((SSID && userInfo)) {
-        setLogin({ SSID, textUser: userInfo.textUser, Name: 'Unvailable:1'});
+        setLogin({ SSID, textUser: userInfo.textUser, Name: 'Unvailable:1' });
         // router.replace("home", { relativeToDirectory: true });
         onStart(); //DEV
       } else {
@@ -63,10 +63,7 @@ export default function Index() {
   }, [USER_info]);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView >
-
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <>
+    </>
   )
 }

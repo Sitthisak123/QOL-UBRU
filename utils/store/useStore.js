@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Course, Grade } from "../db/SQLite";
+import { Course, Grade, Medthods } from "../db/SQLite";
 import { countCredits } from "../methods";
 import { GEGroupName } from "../globalVar";
 
@@ -42,6 +42,8 @@ const useAcademicStore = create((set, get) => ({
   // --- core data ---
   courses: [],
   grades: [],
+  coursesNotInGradeOrSchedule: [],
+
 
   // --- credit summaries ---
   maxCountCredits: {},
@@ -65,14 +67,15 @@ const useAcademicStore = create((set, get) => ({
   // ========== 🔄 ACTIONS ==========
   initData: async () => {
     set({ isLoading: true });
-    const [courses, grades, maxCountCredits, totalCredits] = await Promise.all([
+    const [courses, grades, maxCountCredits, totalCredits, coursesNotInGradeOrSchedule] = await Promise.all([
       Course.getAll(),
       Grade.getAll(),
       Course.countTotalCredits(),
       Grade.countTotalCredits(),
+      Medthods.findCoursesNotInGradeOrSchedule(),
     ]);
 
-    set({ courses, grades, maxCountCredits, totalCredits });
+    set({ courses, grades, maxCountCredits, totalCredits, coursesNotInGradeOrSchedule });
     get().updateGroupings();
     get().updateGPA();
     set({ isLoading: false });

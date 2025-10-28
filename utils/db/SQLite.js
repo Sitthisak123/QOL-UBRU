@@ -56,7 +56,7 @@ export const Course = {
                 }
 
                 const credit = parseInt(course.Credit) || 0;
-                if(groupName === "กลุ่มวิชาประสบการณ์ภาคสนาม" && acc["กลุ่มวิชาประสบการณ์ภาคสนาม"]){
+                if (groupName === "กลุ่มวิชาประสบการณ์ภาคสนาม" && acc["กลุ่มวิชาประสบการณ์ภาคสนาม"]) {
                     return acc;
                 }
                 acc["total"] = (acc["total"] || 0) + credit;
@@ -72,21 +72,6 @@ export const Course = {
             return {};
         }
     },
-    
-    findCoursesNotInGradeOrSchedule: async () => {
-        try {
-            const res = await db.getAllAsync(`
-                SELECT *
-                FROM Course
-                WHERE CourseCode NOT IN (SELECT CourseCode FROM Grade)
-                  AND CourseCode NOT IN (SELECT CourseCode FROM CourseSchedule);
-            `);
-            return res;
-        } catch (error) {
-            console.error("Error finding courses not in Grade or CourseSchedule:", error);
-            return [];
-        }
-    }
 
 };
 
@@ -188,33 +173,37 @@ export const Grade = {
     countTotalCredits: async () => {
         try {
             const grades = await Grade.getAll();
+            // const incompleteGrade = ["", "-"] 
 
             const groupedCredits = grades.reduce((acc, grade) => {
                 let groupName = grade.GroupName?.trim() || "Unknown";
-                
+                // if(!incompleteGrade.includes(grade.Grade)){
+                //     acc["GradesCount"] = (acc["GradesCount"] || 0) + 1;
+                // }
+
                 // If GroupName starts with "GE" + digits → group as "GE"
                 if (/^GE\d+$/i.test(groupName)) {
                     groupName = "GE";
                 }
-                
+
                 const credit = parseInt(grade.Credit) || 0;
                 acc["total"] = (acc["total"] || 0) + credit;
-                if ((groupName === "วิชาเฉพาะบังคับ" || groupName === "กลุ่มวิชาเฉพาะบังคับ") && grade.Grade === "P"){
+                if ((groupName === "วิชาเฉพาะบังคับ" || groupName === "กลุ่มวิชาเฉพาะบังคับ") && grade.Grade === "P") {
                     acc["กลุ่มวิชาบังคับ"] = (acc["กลุ่มวิชาบังคับ"] || 0) + credit;
                     return acc;
                 }
-                if (groupName === "วิชาเฉพาะเลือก" && grade.Grade === "P"){
+                if (groupName === "วิชาเฉพาะเลือก" && grade.Grade === "P") {
                     acc["กลุ่มวิชาเลือก"] = (acc["กลุ่มวิชาเลือก"] || 0) + credit;
                     return acc;
                 }
-                if (groupName === "เอกบังคับ" && grade.Grade === "P"){
+                if (groupName === "เอกบังคับ" && grade.Grade === "P") {
                     acc["กลุ่มวิชาบังคับ"] = (acc["กลุ่มวิชาบังคับ"] || 0) + credit;
                     return acc;
                 }
                 acc[groupName] = (acc[groupName] || 0) + credit;
                 return acc;
             }, {});
-            // console.log(groupedCredits)
+            console.log(groupedCredits)
             return groupedCredits;
 
         } catch (error) {
@@ -412,6 +401,22 @@ export const resetDB = async () => {
     }
 };
 
+export const Medthods = {
+    findCoursesNotInGradeOrSchedule: async () => {
+        try {
+            const res = await db.getAllAsync(`
+                SELECT *
+                FROM Course
+                WHERE CourseCode NOT IN (SELECT CourseCode FROM Grade)
+                  AND CourseCode NOT IN (SELECT CourseCode FROM CourseSchedule);
+            `);
+            return res;
+        } catch (error) {
+            console.error("Error finding courses not in Grade or CourseSchedule:", error);
+            return [];
+        }
+    }
+}
 
 
 

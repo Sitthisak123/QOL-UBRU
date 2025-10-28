@@ -8,11 +8,12 @@ export default function CourseTable({ dataArray = [], color = "#6200ee", propSty
 
     // ✅ ใช้ object พร้อม flex สำหรับแต่ละคอลัมน์
     const defaultHeaders = {
+        "No.": { flex: 0.4 },
         Code: { flex: 1 },
         Name: { flex: 3 },
-        Semester: { flex: 0.8 },
-        Credit: { flex: 0.5 },
-        Grade: { flex: 0.5 },
+        Semester: { flex: 1 },
+        Credit: { flex: 0.8 },
+        Grade: { flex: 0.8 },
     };
     const dataFieldGap = 5;
 
@@ -41,6 +42,9 @@ export default function CourseTable({ dataArray = [], color = "#6200ee", propSty
             {/* Rows */}
             {dataArray.map((item, index) => (
                 <DataTable.Row key={"dtr-" + index} style={{ gap: dataFieldGap }}>
+                    <DataTable.Cell key={"dtc-No"} style={defaultHeaders["No."]}>
+                        {index+1}
+                    </DataTable.Cell>
                     <DataTable.Cell key={"dtc-Code"} style={defaultHeaders.Code}>
                         {item.CourseCode}
                     </DataTable.Cell>

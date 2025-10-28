@@ -7,6 +7,7 @@ import Guage from "../../components/customs/Guage";
 import Dropdown from "../../components/customs/Dropdown";
 import { GEGroupName, GEGroupMaxCredit } from "../../utils/globalVar";
 import CourseTable from "../../components/customs/DataTable";
+import { Course } from "../../utils/db/SQLite";
 
 function academic_statistics() {
   const theme = useTheme();
@@ -24,7 +25,8 @@ function academic_statistics() {
     groupedMaxCountCreditsMJ,
     totalCredits,
     maxCountCredits,
-    grades
+    grades,
+    courses
   } = useAcademicStore();
 
   useEffect(() => {
@@ -110,13 +112,12 @@ function academic_statistics() {
         <Dropdown
           key={"ddgh"}
           headername={"Grades"}
-          credit={"?"}
-          maxCredit={"?"}
+          credit={grades.length}
+          maxCredit={courses.length}
           componentList={[<CourseTable key="grades-table" dataArray={grades} propStyles={{marginLeft: 10}}/>]}
           propstyle={{marginTop: 8, marginBottom: 0}}
         />
       </ScrollView>
-      
     </View>
   );
 }
