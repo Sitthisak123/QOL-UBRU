@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,45 +8,45 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAcademicStore } from "../../utils/store/useStore.js";
 
 export default function List() {
-  const [dataArray1, setDataArray1] = useState([
-    { courseCode: "CS101", courseName: "Intro to Programming" },
-  ]);
 
-  const [dataArray2] = useState([
-    { courseCode: "CS101", courseName: "Intro to Programming" },
-    { courseCode: "CS102", courseName: "Data Structures" },
-    { courseCode: "CS103", courseName: "Computer Networks" },
-    { courseCode: "CS104", courseName: "Operating Systems" },
-    { courseCode: "CS105", courseName: "Database Systems" },
-  ]);
+  const { courseUnregistered, setCourseinPlanner,  courseinPlanner} = useAcademicStore();
+  const [filteredData, setFilteredData] = useState([]);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState("");
+  useEffect(() => {
+    setFilteredData(courseUnregistered.filter((item) => {
+      return (
+        item.CourseName.toLowerCase().includes(search.toLowerCase())
+        ||
+        item.CourseCode.toLowerCase().includes(search.toLowerCase()))
+        &&
+        !courseinPlanner.some(course => course.CourseCode === item.CourseCode)
+    }));
+  }, [search, courseinPlanner])
 
-  const filteredData = dataArray2.filter((item) =>
-    item.courseName.toLowerCase().includes(search.toLowerCase())
-  );
 
   const handleAdd = (item) => {
-    if (!dataArray1.some((c) => c.courseCode === item.courseCode)) {
-      setDataArray1([...dataArray1, item]);
+    if (!courseinPlanner.some((c) => c.CourseCode === item.CourseCode)) {
+      setCourseinPlanner([...courseinPlanner, item]);
     }
     setModalVisible(false);
     setSearch("");
   };
 
-  const handleRemove = (courseCode) => {
-    setDataArray1(dataArray1.filter((item) => item.courseCode !== courseCode));
+  const handleRemove = (CourseCode) => {
+    setCourseinPlanner(courseinPlanner.filter((item) => item.CourseCode !== CourseCode));
   };
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
       {/* Main List */}
       <FlatList
-        data={dataArray1}
-        keyExtractor={(item) => item.courseCode}
+        data={courseinPlanner}
+        keyExtractor={(item) => item.CourseCode}
         renderItem={({ item }) => (
           <View
             style={{
@@ -60,12 +60,12 @@ export default function List() {
             }}
           >
             <View>
-              <Text style={{ fontWeight: "bold" }}>{item.courseName}</Text>
-              <Text style={{ color: "gray" }}>{item.courseCode}</Text>
+              <Text style={{ fontWeight: "bold" }}>{item.CourseName}</Text>
+              <Text style={{ color: "gray" }}>{item.CourseCode}</Text>
             </View>
 
             <TouchableOpacity
-              onPress={() => handleRemove(item.courseCode)}
+              onPress={() => handleRemove(item.CourseCode)}
               style={{
                 backgroundColor: "#ff4d4f",
                 padding: 8,
@@ -112,7 +112,7 @@ export default function List() {
           />
           <FlatList
             data={filteredData}
-            keyExtractor={(item) => item.courseCode}
+            keyExtractor={(item) => item.CourseCode}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => handleAdd(item)}
@@ -122,8 +122,8 @@ export default function List() {
                   borderBottomColor: "#eee",
                 }}
               >
-                <Text style={{ fontWeight: "bold" }}>{item.courseName}</Text>
-                <Text style={{ color: "gray" }}>{item.courseCode}</Text>
+                <Text style={{ fontWeight: "bold" }}>{item.CourseName}</Text>
+                <Text style={{ color: "gray" }}>{item.CourseCode}</Text>
               </TouchableOpacity>
             )}
           />

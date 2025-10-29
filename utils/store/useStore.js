@@ -42,15 +42,13 @@ const dayOrder = {
   "จ": 1, "อ": 2, "พ": 3, "พฤ": 4, "ศ": 5, "ส": 6, "อา": 7
 };
 
-function startTimeInMinutes(scheduleTime, c) {
-  console.log(scheduleTime,c);
+function startTimeInMinutes(scheduleTime) {
   // const dayMatch = schedule.match(/^[ก-ฮ]+/);
   // const day = dayMatch ? dayMatch[0] : "";
   // const timePart = schedule.replace(day, "");
 
   const [start] = scheduleTime.split("-");
   const [hours, minutes] = start.split(":").map(Number);
-  console.log(start);
   return hours * 60 + minutes;
 }
 
@@ -135,8 +133,13 @@ const useAcademicStore = create((set, get) => ({
     get().updateSemesters(courses, (semesters) => set({ semestersWithCourses: semesters }));
     get().updateSemesters(courseSchedule, (semesters) => set({ semestersWithSchedule: semesters }));
     get().sortingCourse(courseSchedule, (sortedArray) => set({ courseScheduleSorted: sortedArray }));
+    get().updateCourseUnregistered();
     set({ isLoading: false });
     return
+  },
+
+  setCourseinPlanner: (dataArray=[])=>{
+    set({courseinPlanner: dataArray})
   },
 
   setCourses: (courses) => {
@@ -150,15 +153,15 @@ const useAcademicStore = create((set, get) => ({
     get().updateGPA();
   },
 
-sortingCourse: (dataArray = [], callback) => {
-  const sortedArray = [...dataArray].sort((a, b) => {
-    if (a.Year !== b.Year) return a.Year - b.Year;
-    if (a.Semester !== b.Semester) return a.Semester - b.Semester;
-    if (dayOrder[a.ScheduleDate] !== dayOrder[b.ScheduleDate]) return dayOrder[a.ScheduleDate] - dayOrder[b.ScheduleDate];
-    return startTimeInMinutes(a.ScheduleTime, "a") - startTimeInMinutes(b.ScheduleTime, "b");
-  });
-  callback(sortedArray);
-},
+  sortingCourse: (dataArray = [], callback) => {
+    const sortedArray = [...dataArray].sort((a, b) => {
+      if (a.Year !== b.Year) return a.Year - b.Year;
+      if (a.Semester !== b.Semester) return a.Semester - b.Semester;
+      if (dayOrder[a.ScheduleDate] !== dayOrder[b.ScheduleDate]) return dayOrder[a.ScheduleDate] - dayOrder[b.ScheduleDate];
+      return startTimeInMinutes(a.ScheduleTime) - startTimeInMinutes(b.ScheduleTime);
+    });
+    callback(sortedArray);
+  },
 
   updateSemesters: (dataArray = [], callback) => {
     const temp = dataArray.reduce((acc, course) => {
@@ -213,6 +216,23 @@ sortingCourse: (dataArray = [], callback) => {
 
     set({ gradesIncomplete });
   },
+
+  updateCourseUnregistered: () => {
+    const { courses, courseSchedule, grades } = get();
+
+    const unRegis = courses.filter(course => {
+      if (course.GroupName === "GE") {
+        return false
+      }
+      const inSchedule = courseSchedule.some(cs => cs.CourseCode === course.CourseCode);
+      const inGrades = grades.some(g => g.CourseCode === course.CourseCode);
+      return !inSchedule && !inGrades;
+    });
+
+    console.log(unRegis);
+    set({ courseUnregistered: unRegis });
+  },
+
 
   /** 🎓 GPA CALCULATION */
   updateGPA: () => {

@@ -18,11 +18,13 @@ const toMinutes = (time) => {
   const [h, m] = time.split(":").map(Number);
   return h * 60 + m;
 };
+
 const toTimeString = (minutes) => {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
 };
+
 const generateTimeSlots = (startTime, endTime, interval = 30) => {
   const slots = [];
   let [hour, minute] = startTime.split(":").map(Number);
@@ -37,6 +39,7 @@ const generateTimeSlots = (startTime, endTime, interval = 30) => {
   }
   return slots;
 };
+
 const getDynamicTimeRange = (data) => {
   let minStart = Infinity;
   let maxEnd = -Infinity;
@@ -57,110 +60,110 @@ export default function TimeScheduleTable() {
   const { start, end } = getDynamicTimeRange(dataArray1);
   const timeSlots = generateTimeSlots(start, end, 30);
 
-  return (
-    <ScrollView style={{ flex: 1, backgroundColor: "#f8f9fa" }}>
-      {/* === Scrollable timetable === */}
-      <ScrollView horizontal style={styles.container}>
-        <DataTable style={styles.table}>
-          {/* Header row */}
-          <DataTable.Header style={styles.header}>
-            <DataTable.Title style={styles.dayColumn}></DataTable.Title>
-            {timeSlots.map((slot) => (
-              <DataTable.Title key={slot} style={styles.timeColumn}>
-                <Text style={styles.headerText}>{slot}</Text>
-              </DataTable.Title>
-            ))}
-          </DataTable.Header>
+  // Render timetable header
+  const renderTimeTable = () => (
+    <ScrollView horizontal style={styles.container}>
+      <DataTable style={styles.table}>
+        {/* Header row */}
+        <DataTable.Header style={styles.header}>
+          <DataTable.Title style={styles.dayColumn}></DataTable.Title>
+          {timeSlots.map((slot) => (
+            <DataTable.Title key={slot} style={styles.timeColumn}>
+              <Text style={styles.headerText}>{slot}</Text>
+            </DataTable.Title>
+          ))}
+        </DataTable.Header>
 
-          {/* Each day row */}
-          {days.map((day, dayIndex) => {
-            const dayCourses = dataArray1.filter((c) => c.scourseScheduleDate === dayIndex);
-            return (
-              <DataTable.Row key={dayIndex} style={styles.row}>
-                <DataTable.Cell style={styles.dayColumn}>
-                  <Text style={styles.dayText}>{day}</Text>
-                </DataTable.Cell>
+        {/* Each day row */}
+        {days.map((day, dayIndex) => {
+          const dayCourses = dataArray1.filter((c) => c.scourseScheduleDate === dayIndex);
+          return (
+            <DataTable.Row key={dayIndex} style={styles.row}>
+              <DataTable.Cell style={styles.dayColumn}>
+                <Text style={styles.dayText}>{day}</Text>
+              </DataTable.Cell>
 
-                {/* Render cells dynamically */}
-                {(() => {
-                  const cells = [];
-                  let i = 0;
-                  while (i < timeSlots.length) {
-                    const slot = timeSlots[i];
-                    const slotMin = toMinutes(slot);
-                    const course = dayCourses.find((c) => {
-                      const [start, end] = c.scourseScheduleTime.split("-");
-                      const startMin = toMinutes(start);
-                      const endMin = toMinutes(end);
-                      return slotMin >= startMin && slotMin < endMin;
-                    });
+              {/* Render cells dynamically */}
+              {(() => {
+                const cells = [];
+                let i = 0;
+                while (i < timeSlots.length) {
+                  const slot = timeSlots[i];
+                  const slotMin = toMinutes(slot);
+                  const course = dayCourses.find((c) => {
+                    const [start, end] = c.scourseScheduleTime.split("-");
+                    const startMin = toMinutes(start);
+                    const endMin = toMinutes(end);
+                    return slotMin >= startMin && slotMin < endMin;
+                  });
 
-                    if (course) {
-                      const [start, end] = course.scourseScheduleTime.split("-");
-                      const startMin = toMinutes(start);
-                      const endMin = toMinutes(end);
-                      const duration = Math.ceil((endMin - startMin) / 30);
+                  if (course) {
+                    const [start, end] = course.scourseScheduleTime.split("-");
+                    const startMin = toMinutes(start);
+                    const endMin = toMinutes(end);
+                    const duration = Math.ceil((endMin - startMin) / 30);
 
-                      cells.push(
-                        <View
-                          key={`${dayIndex}-${slot}`}
-                          style={[
-                            styles.timeColumn,
-                            {
-                              backgroundColor: "#ffcb69",
-                              width: 70 * duration,
-                              justifyContent: "center",
-                              alignItems: "center",
-                              borderColor: "#dee2e6",
-                              borderWidth: 0.5,
-                            },
-                          ]}
-                        >
-                          <Text style={styles.cellText}>{course.courseName}</Text>
-                        </View>
-                      );
-                      i += duration;
-                    } else {
-                      cells.push(
-                        <View key={`${dayIndex}-${slot}`} style={[styles.timeColumn, styles.emptyCell]} />
-                      );
-                      i++;
-                    }
+                    cells.push(
+                      <View
+                        key={`${dayIndex}-${slot}`}
+                        style={[
+                          styles.timeColumn,
+                          {
+                            backgroundColor: "#ffcb69",
+                            width: 70 * duration,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            borderColor: "#dee2e6",
+                            borderWidth: 0.5,
+                          },
+                        ]}
+                      >
+                        <Text style={styles.cellText}>{course.courseName}</Text>
+                      </View>
+                    );
+                    i += duration;
+                  } else {
+                    cells.push(
+                      <View key={`${dayIndex}-${slot}`} style={[styles.timeColumn, styles.emptyCell]} />
+                    );
+                    i++;
                   }
-                  return cells;
-                })()}
-              </DataTable.Row>
-            );
-          })}
-        </DataTable>
-      </ScrollView>
-
-      {/* === List below table === */}
-      <View style={styles.listContainer}>
-        <Text style={styles.listTitle}>📘 Course Schedule Summary</Text>
-        <FlatList
-          data={dataArray1}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item, index }) => (
-            <View
-              style={[
-                styles.listItem,
-                { backgroundColor: dayColors[item.scourseScheduleDate % dayColors.length] },
-              ]}
-            >
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={styles.listIndex}>{index + 1}.</Text>
-                <Text style={styles.listDay}>{days[item.scourseScheduleDate]}</Text>
-              </View>
-              <Text style={styles.listCourseCode}>{item.courseCode}</Text>
-              <Text style={styles.listCourseName}>{item.courseName}</Text>
-              <Text style={styles.listScheduleTime}>{item.scourseScheduleTime}</Text>
-            </View>
-          )}
-          ListEmptyComponent={<Text style={{ textAlign: "center" }}>No courses found.</Text>}
-        />
-      </View>
+                }
+                return cells;
+              })()}
+            </DataTable.Row>
+          );
+        })}
+      </DataTable>
     </ScrollView>
+  );
+
+  return (
+    <FlatList
+      data={dataArray1}
+      keyExtractor={(item, index) => index.toString()}
+      ListHeaderComponent={
+        <View>
+          {renderTimeTable()}
+          <Text style={styles.listTitle}>📘 Course Schedule Summary</Text>
+        </View>
+      }
+      renderItem={({ item, index }) => (
+        <View
+          style={[styles.listItem, { backgroundColor: dayColors[item.scourseScheduleDate % dayColors.length] }]}
+        >
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={styles.listIndex}>{index + 1}.</Text>
+            <Text style={styles.listDay}>{days[item.scourseScheduleDate]}</Text>
+          </View>
+          <Text style={styles.listCourseCode}>{item.courseCode}</Text>
+          <Text style={styles.listCourseName}>{item.courseName}</Text>
+          <Text style={styles.listScheduleTime}>{item.scourseScheduleTime}</Text>
+        </View>
+      )}
+      ListEmptyComponent={<Text style={{ textAlign: "center", marginTop: 20 }}>No courses found.</Text>}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
   );
 }
 
@@ -218,19 +221,18 @@ const styles = StyleSheet.create({
   },
 
   // === List styling ===
-  listContainer: {
-    marginTop: 20,
-    paddingHorizontal: 16,
-  },
   listTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    marginTop: 20,
     marginBottom: 10,
+    paddingHorizontal: 16,
     color: "#14213d",
   },
   listItem: {
     padding: 14,
     borderRadius: 10,
+    marginHorizontal: 16,
     marginBottom: 8,
     elevation: 1,
   },
