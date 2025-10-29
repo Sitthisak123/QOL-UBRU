@@ -239,7 +239,7 @@ function insertSchedule(rows, semester, year) {
                 const scdTime = ScheduleTime.replace(/.*\((.*?)\).*/, "$1").replace(/\s+/g, "");//13.50-17.10
                 // console.log("processing insert scdTable:")
                 // console.log(data[1], data[2], data[3], data[4], data[5], data[6], scdDate, scdTime, data[10], data[11], semester, year)
-                CourseSchedule.insert(data[1], data[2], data[3], data[4], data[5], data[6], scdDate, scdTime, data[10], data[11], semester, year);
+                CourseSchedule.insert(data[1], data[2], data[3], data[4], data[5], data[6],  scdTime, scdDate, data[10], data[11], semester, year);
             }
         } catch (error) {
             console.error("Error processing plan row:", error);

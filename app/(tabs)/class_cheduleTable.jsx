@@ -6,7 +6,7 @@ import SelectorDropdown from "../../components/customs/SelectorDropdown";
 import { globalCustomStyles } from "../../utils/globalStyles";
 import { useTheme } from "react-native-paper";
 const Page = () => {
-  const { courseSchedule, semestersWithSchedule } = useAcademicStore();
+  const { courseScheduleSorted, semestersWithSchedule } = useAcademicStore();
   const [selectedSemester, setSelectedSemester] = useState("-");
   const theme = useTheme();
   const customStyle = globalCustomStyles(theme);
@@ -29,17 +29,6 @@ function startTimeInMinutes(schedule) {
   return hours * 60 + minutes;
 }
 
-schedules.sort((a, b) => {
-  const dayA = a.match(/^[ก-ฮ]+/)[0];
-  const dayB = b.match(/^[ก-ฮ]+/)[0];
-
-  if (dayOrder[dayA] !== dayOrder[dayB]) {
-    return dayOrder[dayA] - dayOrder[dayB];
-  } else {
-    return startTimeInMinutes(a) - startTimeInMinutes(b);
-  }
-});
-
   return (
     <View style={customStyle.view}>
       <ScrollView style={customStyle.subView}>
@@ -52,8 +41,8 @@ schedules.sort((a, b) => {
         <ScheduleTable
           dataArray={
             selectedSemester === "-"
-              ? courseSchedule
-              : courseSchedule.filter(
+              ? courseScheduleSorted
+              : courseScheduleSorted.filter(
                   (c) => `${c.Semester}/${c.Year}` === selectedSemester
                 )
           }
