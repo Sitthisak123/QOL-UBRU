@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { View, Text } from "react-native";
-import { Calendar } from "react-native-calendars";
+import { View, Text, Dimensions } from "react-native";
+import { CalendarList } from "react-native-calendars";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function ExamSchedule() {
-  // Example schedule data
   const [dataArray1] = useState([
     {
       courseName: "Math 101",
@@ -23,7 +22,14 @@ export default function ExamSchedule() {
     },
   ]);
 
-  // Map events to calendar marking format
+  // 1️⃣ Extract all months with events
+  const monthsWithEvents = Array.from(
+    new Set(
+      dataArray1.map((item) => item.courseScheduleDateTime.slice(0, 7))
+    )
+  ); // e.g., ["2025-10", "2025-11"]
+
+  // 2️⃣ Prepare markedDates for all events
   const markedDates = dataArray1.reduce((acc, item) => {
     acc[item.courseScheduleDateTime] = {
       marked: true,
@@ -39,18 +45,28 @@ export default function ExamSchedule() {
     (item) => item.courseScheduleDateTime === selected
   );
 
+  // 3️⃣ CalendarList horizontal paging (only months with events)
   return (
-    <View style={{ flex: 1, backgroundColor: "white", padding: 10 }}>
-      <Calendar
-        monthFormat={"MMMM yyyy"}
-        onDayPress={(day) => setSelected(day.dateString)}
+    <View style={{ flex: 1, padding: 10, backgroundColor: "white" }}>
+      <CalendarList
+        horizontal
+        pagingEnabled
+        // enableSwipeMonths={true} 
+        calendarWidth={Dimensions.get("window").width}
+        pastScrollRange={0}
+        futureScrollRange={monthsWithEvents.length - 1}
+        current={monthsWithEvents[0] + "-01"} // first month
+        minDate={monthsWithEvents[0] + "-01"}
+        maxDate={
+          monthsWithEvents[monthsWithEvents.length - 1] + "-31"
+        } // rough max
         markedDates={{
           ...markedDates,
           ...(selected && {
             [selected]: { selected: true, selectedColor: "#007AFF" },
           }),
         }}
-        enableSwipeMonths={true} // swipe between months (pagination)
+        onDayPress={(day) => setSelected(day.dateString)}
         theme={{
           selectedDayBackgroundColor: "#007AFF",
           todayTextColor: "#007AFF",
