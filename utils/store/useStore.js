@@ -61,6 +61,9 @@ const useAcademicStore = create((set, get) => ({
   courseSchedule: [],
   examSchedule: [],
 
+  courseinPlanner: [],
+  courseUnregistered: [],
+
   // --- filtered ---
   coursesNotInGradeOrSchedule: [],
   gradesIncomplete: [], //not in Grade and in courseSchedule
