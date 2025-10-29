@@ -5,7 +5,7 @@ import { Button, ScrollView, Text, View } from "react-native";
 import cheerio from 'react-native-cheerio';
 import { asyncStorage_getItem } from "../../utils/db/AsyncStorage";
 import { Grade } from "../../utils/db/SQLite";
-import DataTable from "../../components/customs/DataTable"
+import CourseTable from "../../components/customs/CourseTable"
 import { useAcademicStore } from "../../utils/store/useStore";
 import { globalCustomStyles } from "../../utils/globalStyles";
 import { useTheme } from "react-native-paper";
@@ -16,9 +16,9 @@ const page = () => {
   return (
     <View style={customStyles.view}>
       <ScrollView>
-        <DataTable dataArray={grades} />
+        <CourseTable dataArray={grades} />
         <Text style={[customStyles.TextHeader, { textAlign: "center", marginTop: 10, backgroundColor: theme.colors.backdrop }]} > Pedding/Learnning </Text>
-        <DataTable dataArray={gradesIncomplete} />
+        <CourseTable dataArray={gradesIncomplete} />
       </ScrollView>
     </View>
   )

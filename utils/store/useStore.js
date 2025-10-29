@@ -1,19 +1,19 @@
 import { create } from 'zustand';
-import { Course, Grade, CourseSchedule, Medthods } from "../db/SQLite";
+import { Course, Grade, CourseSchedule, Medthods, ExamSchedule } from "../db/SQLite";
 import { countCredits } from "../methods";
 import { GEGroupName } from "../globalVar";
 
 const useUserInfo = create((set) => ({
-    USER_info: { isInit: false, isLogin: false, SSID: '', textUser: '', loginDate: '', Name: 'Unvailable'},
-    login: (newstate) =>
-        set((prevState) => ({
-            USER_info: { ...newstate, isInit: true, isLogin: true, loginDate: new Date()}
-        })),
-    updateinfo: (newstate) =>
-        set((prevState) => ({
-            USER_info: { ...prevState.USER_info, ...newstate }
-        })),
-    logout: () => set(() => ({ USER_info: { isInit: true, isLogin: false, SSID: '', textUser: '', loginDate: '', Name: 'Unvailable' } })),
+  USER_info: { isInit: false, isLogin: false, SSID: '', textUser: '', loginDate: '', Name: 'Unvailable' },
+  login: (newstate) =>
+    set((prevState) => ({
+      USER_info: { ...newstate, isInit: true, isLogin: true, loginDate: new Date() }
+    })),
+  updateinfo: (newstate) =>
+    set((prevState) => ({
+      USER_info: { ...prevState.USER_info, ...newstate }
+    })),
+  logout: () => set(() => ({ USER_info: { isInit: true, isLogin: false, SSID: '', textUser: '', loginDate: '', Name: 'Unvailable' } })),
 
 }));
 
@@ -37,17 +37,21 @@ function groupCourse(courses) {
 
   return result;
 }
- 
+
 const useAcademicStore = create((set, get) => ({
   // --- core data ---
   courses: [],
   grades: [],
   courseSchedule: [],
+  examSchedule: [],
 
   // --- filtered ---
   coursesNotInGradeOrSchedule: [],
   gradesIncomplete: [], //not in Grade and in courseSchedule
-  
+
+  semestersWithCourses: [],
+  semestersWithSchedule: [],
+
 
   // --- credit summaries ---
   maxCountCredits: {},
@@ -72,18 +76,20 @@ const useAcademicStore = create((set, get) => ({
   initData: async () => {
     set({ isLoading: true });
     const [
-      courses, 
-      grades, 
+      courses,
+      grades,
       courseSchedule,
+      examSchedule,
 
-      maxCountCredits, 
-      totalCredits, 
-      coursesNotInGradeOrSchedule, 
+      maxCountCredits,
+      totalCredits,
+      coursesNotInGradeOrSchedule,
     ] = await Promise.all([
 
       Course.getAll(),
       Grade.getAll(),
       CourseSchedule.getAll(),
+      ExamSchedule.getAll(),
 
       Course.countTotalCredits(),
       Grade.countTotalCredits(),
@@ -91,11 +97,23 @@ const useAcademicStore = create((set, get) => ({
 
     ]);
 
-    set({ courses, grades, maxCountCredits, totalCredits, coursesNotInGradeOrSchedule,  courseSchedule });
+    set({
+      courses,
+      grades,
+      maxCountCredits,
+      totalCredits,
+      coursesNotInGradeOrSchedule,
+      courseSchedule,
+      examSchedule,
+
+    });
     get().updateGroupings();
     get().updateGPA();
     get().updateGradesIncomplete();
+    get().updateSemesters(courses, (semesters) => set({ semestersWithCourses: semesters }));
+    get().updateSemesters(courseSchedule, (semesters) => set({ semestersWithSchedule: semesters }));
     set({ isLoading: false });
+    return
   },
 
   setCourses: (courses) => {
@@ -107,6 +125,19 @@ const useAcademicStore = create((set, get) => ({
     set({ grades });
     get().updateGroupings();
     get().updateGPA();
+  },
+
+  updateSemesters: (dataArray = [], callback) => {
+    const temp = dataArray.reduce((acc, course) => {
+      const key = `${course.Semester}/${course.Year}`;
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {})
+    const semesters = Object.entries(temp)
+      .filter(([key, count]) => count > 0) // keep only ones with n > 0
+      .map(([key]) => key);
+    console.log(semesters);
+    callback(semesters);
   },
 
   updateGroupings: () => {
@@ -131,25 +162,25 @@ const useAcademicStore = create((set, get) => ({
   },
 
   updateGradesIncomplete: () => {
-  const { courseSchedule, grades } = get();
+    const { courseSchedule, grades } = get();
 
-  if (!Array.isArray(courseSchedule) || !Array.isArray(grades)) {
-    console.warn("Invalid data in updateGradesIncomplete");
-    return;
-  }
-  // collect all CourseCode that already have grades
-  const gradedCodes = new Set(
-  grades
-    .map(g => g.CourseCode)
-);
+    if (!Array.isArray(courseSchedule) || !Array.isArray(grades)) {
+      console.warn("Invalid data in updateGradesIncomplete");
+      return;
+    }
+    // collect all CourseCode that already have grades
+    const gradedCodes = new Set(
+      grades
+        .map(g => g.CourseCode)
+    );
 
-  // filter from courseSchedule those not yet graded
-  const gradesIncomplete = courseSchedule.filter(
-    (course) => !gradedCodes.has(course.CourseCode)
-  );
+    // filter from courseSchedule those not yet graded
+    const gradesIncomplete = courseSchedule.filter(
+      (course) => !gradedCodes.has(course.CourseCode)
+    );
 
-  set({ gradesIncomplete });
-},
+    set({ gradesIncomplete });
+  },
 
   /** 🎓 GPA CALCULATION */
   updateGPA: () => {
@@ -193,6 +224,8 @@ const useAcademicStore = create((set, get) => ({
 
     set({ gpa: parseFloat(gpa.toFixed(2)) });
   },
+
+
 
   reset: () =>
     set({

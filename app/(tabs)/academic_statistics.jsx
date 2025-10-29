@@ -6,19 +6,17 @@ import { useUserInfo, useAcademicStore } from "../../utils/store/useStore";
 import Guage from "../../components/customs/Guage";
 import Dropdown from "../../components/customs/Dropdown";
 import { GEGroupName, GEGroupMaxCredit } from "../../utils/globalVar";
-import CourseTable from "../../components/customs/DataTable";
+import CourseTable from "../../components/customs/CourseTable";
 import { Course } from "../../utils/db/SQLite";
 
 function academic_statistics() {
   const theme = useTheme();
   const { textUser, Name } = useUserInfo((state) => state.USER_info);
-  const { gpa } = useAcademicStore((state) => state);
   const globalStyles = globalCustomStyles(theme);
   const GEGroup = GEGroupName();
 
   const {
     isLoading,
-    initData,
     groupedTotalCreditsGE,
     groupedTotalCreditsMJ,
     groupedMaxCountCreditsGE,
@@ -26,12 +24,10 @@ function academic_statistics() {
     totalCredits,
     maxCountCredits,
     grades,
-    courses
+    courses,
+    gpa,
   } = useAcademicStore();
 
-  useEffect(() => {
-    initData(); // load + compute all once
-  }, []);
 
   if (isLoading) {
     return (

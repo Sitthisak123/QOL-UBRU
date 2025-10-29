@@ -6,10 +6,12 @@ import { asyncStorage_getItem } from '../../utils/db/AsyncStorage';
 import { useUserInfo } from '../../utils/store/useStore';
 import { router } from "expo-router";
 import { resetDB } from '../../utils/db/SQLite';
+import { useAcademicStore } from '../../utils/store/useStore';
 
 function init() {
     const theme = useTheme();
     const textUser = useUserInfo((state) => state.USER_info.textUser);
+    const {initData} = useAcademicStore();
     const [fecthProgress, setFetchProgress] = useState({ plan: 0, schedule: 0, ExamSchedule: 0, grade: 0 });
     const taltolFecthtask = { plan: 12, schedule: 9, ExamSchedule: 9, grade: 1 };
     const [isProgressing, setIsProgress] = useState({ plan: false, schedule: false, ExamSchedule: false, grade: false });
@@ -97,7 +99,8 @@ function init() {
         await fetchGrades(firstTwoSSID, setFetchProgress);
 
         // await new Promise(resolve => setTimeout(resolve, 3550));
-
+        await initData();
+        
         router.replace("home", { relativeToDirectory: true });
     }
 

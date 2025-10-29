@@ -248,6 +248,8 @@ function insertSchedule(rows, semester, year) {
 }
 function insertExamSchedule(rows, semester, year) {
     rows.forEach(row => {
+        const currentBE = (new Date().getFullYear() + 543)
+        const currentBEPrefix = currentBE.toString().slice(0, 2);
         try {
             if (row.data.length > 0) {
                 const { data } = row
@@ -258,7 +260,7 @@ function insertExamSchedule(rows, semester, year) {
                 const midSCDTime = data[7].replace(/\s+/g, "");     //10.30 -    12.30   >          10.30-12.30
                 const finalSCDTime = data[9].replace(/\s+/g, "");   //10.30 - 12.30      >          10.30-12.30
 
-                ExamSchedule.insert(data[1], data[2], data[3], data[4], data[5], midSCDTime, data[8], finalSCDTime, semester, year);
+                ExamSchedule.insert(data[1], data[2], data[3], data[4], data[5], midSCDTime, data[8], finalSCDTime, semester, `${currentBEPrefix}${year}`);
             }
         } catch (error) {
             console.error("Error processing plan row:", error);

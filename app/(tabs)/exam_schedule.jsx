@@ -1,63 +1,38 @@
-import axios from "axios";
-import React, { useLayoutEffect, useRef, useState } from 'react';
-import { useEffect } from 'react';
-import { Button, ScrollView, Text, View } from "react-native";
-import cheerio from 'react-native-cheerio';
-import { asyncStorage_getItem } from "../../utils/db/AsyncStorage";
-import { DataTable, TextInput } from 'react-native-paper';
-import { ExamSchedule } from "../../utils/db/SQLite";
+import React, { useState } from "react";
+import { ScrollView, View } from "react-native";
+import { useAcademicStore } from "../../utils/store/useStore";
+import ExamTable from "../../components/customs/ExamTable";
+import SelectorDropdown from "../../components/customs/SelectorDropdown";
+import { globalCustomStyles } from "../../utils/globalStyles";
+import { useTheme } from "react-native-paper";
+const Page = () => {
+  const { examSchedule, semestersWithSchedule } = useAcademicStore();
+  const [selectedSemester, setSelectedSemester] = useState("-");
+  const theme = useTheme();
+  const customStyle = globalCustomStyles(theme);
+  const semesterOptions = []; // example data; can come from store
 
-const page = () => {
-    const [tables, setTables] = useState([]);
-    const [ddTerm, setddTerm] = useState('');
-    useLayoutEffect(() => {
-        async function initData() {
-            const getScheduleTables = await ExamSchedule.getAll();
-            setTables(getScheduleTables);
-        }
-        initData();
-    }, []);
-
-    return (
-        <View style={customStyles.view}>
-            <ScrollView style={customStyles.scrollView}>
-                <ScrollView horizontal={true}>
-                    <DataTable>
-                        <DataTable.Header>
-                            {
-                                Object.keys(tables[0] || {}).map((key, idx) => (
-                                    <DataTable.Title key={idx} textStyle={customStyles.fieldDataColor}>{key}</DataTable.Title>
-                                ))
-                            }
-                        </DataTable.Header>
-                        {
-                            tables && tables.map((item, idx) => (
-                                <DataTable.Row key={idx}>
-                                    {Object.values(item).map((cell, cellIdx) => (
-                                        <DataTable.Cell key={cellIdx} textStyle={customStyles.fieldDataColor}>{cell}</DataTable.Cell>
-                                    ))}
-                                </DataTable.Row>
-                            ))
-                        }
-
-                    </DataTable>
-                </ScrollView>
-            </ScrollView>
-        </View>
-    )
-}
-export default page;
-
-
-const customStyles = {
-    view: {
-        flex: 1,
-    },
-    scrollView: {
-        flex: 1,
-        padding: 0,
-    },
-    fieldDataColor: {
-        color: 'black',
-    },
+  return (
+    <View style={customStyle.view}>
+      <ScrollView style={customStyle.subView}>
+        <SelectorDropdown
+          options={semestersWithSchedule}
+          value={selectedSemester}
+          onSelect={setSelectedSemester}
+          label="Semester / Year"
+        />
+        <ExamTable
+          dataArray={
+            selectedSemester === "-"
+              ? examSchedule
+              : examSchedule.filter(
+                  (c) => `${c.Semester}/${c.Year}` === selectedSemester
+                )
+          }
+        />
+      </ScrollView>
+    </View>
+  );
 };
+
+export default Page;

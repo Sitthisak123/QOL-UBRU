@@ -6,12 +6,12 @@ import { asyncStorage_getItem } from "../utils/db/AsyncStorage";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useUserInfo } from "../utils/store/useStore";
 import { initDB } from '../utils/db/SQLite';
-
+import { useAcademicStore } from "../utils/store/useStore";
 
 export default function Index() {
   const setLogin = useUserInfo((state) => state.login);
   const USER_info = useUserInfo(state => state.USER_info);
-
+  const { initData } = useAcademicStore();
   const [appState, setAppState] = useState(AppState.currentState);
   const onResume = () => {
     // router.replace("auth", { relativeToDirectory: true });
@@ -19,7 +19,7 @@ export default function Index() {
 
   //DEV 
   function onStart() {
-    router.replace("learning_plan", { relativeToDirectory: true });
+    router.replace("exam_schedule", { relativeToDirectory: true });
   }
   //DEV 
 
@@ -46,6 +46,7 @@ export default function Index() {
       if ((SSID && userInfo)) {
         setLogin({ SSID, textUser: userInfo.textUser, Name: 'Unvailable:1' });
         // router.replace("home", { relativeToDirectory: true });
+        await initData()
         onStart(); //DEV
       } else {
         router.replace("auth", { relativeToDirectory: true });

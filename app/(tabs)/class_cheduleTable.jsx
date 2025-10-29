@@ -1,62 +1,66 @@
-import axios from "axios";
-import React, { useLayoutEffect, useRef, useState } from 'react';
-import { useEffect } from 'react';
-import { Button, ScrollView, Text, View } from "react-native";
-import cheerio from 'react-native-cheerio';
-import { asyncStorage_getItem } from "../../utils/db/AsyncStorage";
-import { DataTable, TextInput } from 'react-native-paper';
-import { CourseSchedule } from "../../utils/db/SQLite";
-const page = () => {
-    const [tables, setTables] = useState([]);
-
-    useLayoutEffect(() => {
-        async function initData() {
-            const getScheduleTables = await CourseSchedule.getAll();
-            setTables(getScheduleTables);
-        }
-        initData();
-    }, []);
-
-    return (
-        <View style={customStyles.view}>
-            <ScrollView style={customStyles.scrollView}>
-                <ScrollView horizontal={true}>
-                    <DataTable>
-                        <DataTable.Header>
-                            {
-                                Object.keys(tables[0] || {}).map((key, idx) => (
-                                    <DataTable.Title key={idx} textStyle={customStyles.fieldDataColor}>{key}</DataTable.Title>
-                                ))
-                            }
-                        </DataTable.Header>
-                        {
-                            tables && tables.map((item, idx) => (
-                                <DataTable.Row key={idx}>
-                                    {Object.values(item).map((cell, cellIdx) => (
-                                        <DataTable.Cell key={cellIdx} textStyle={customStyles.fieldDataColor}>{cell}</DataTable.Cell>
-                                    ))}
-                                </DataTable.Row>
-                            ))
-                        }
-
-                    </DataTable>
-                </ScrollView>
-            </ScrollView>
-        </View>
-    )
-}
-export default page;
-
-
-const customStyles = {
-    view: {
-        flex: 1,
-    },
-    scrollView: {
-        flex: 1,
-        padding: 0,
-    },
-    fieldDataColor: {
-        color: 'black',
-    },
+import React, { useState } from "react";
+import { ScrollView, View } from "react-native";
+import { useAcademicStore } from "../../utils/store/useStore";
+import ScheduleTable from "../../components/customs/ScheduleTable";
+import SelectorDropdown from "../../components/customs/SelectorDropdown";
+import { globalCustomStyles } from "../../utils/globalStyles";
+import { useTheme } from "react-native-paper";
+const Page = () => {
+  const { courseSchedule, semestersWithSchedule } = useAcademicStore();
+  const [selectedSemester, setSelectedSemester] = useState("-");
+  const theme = useTheme();
+  const customStyle = globalCustomStyles(theme);
+  const semesterOptions = []; // example data; can come from store
+  const dayOrder = {
+  "จ": 1, // Monday
+  "อ": 2, // Tuesday
+  "พ": 3, // Wednesday
+  "พฤ": 4, // Thursday
+  "ศ": 5, // Friday
+  "ส": 6, // Saturday
+  "อา": 7  // Sunday
 };
+function startTimeInMinutes(schedule) {
+  const dayMatch = schedule.match(/^[ก-ฮ]+/); // ดึงวันไทย
+  const day = dayMatch ? dayMatch[0] : "";
+  const timePart = schedule.replace(day, ""); // ลบวัน
+  const [start, end] = timePart.split("-");
+  const [hours, minutes] = start.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+
+schedules.sort((a, b) => {
+  const dayA = a.match(/^[ก-ฮ]+/)[0];
+  const dayB = b.match(/^[ก-ฮ]+/)[0];
+
+  if (dayOrder[dayA] !== dayOrder[dayB]) {
+    return dayOrder[dayA] - dayOrder[dayB];
+  } else {
+    return startTimeInMinutes(a) - startTimeInMinutes(b);
+  }
+});
+
+  return (
+    <View style={customStyle.view}>
+      <ScrollView style={customStyle.subView}>
+        <SelectorDropdown
+          options={semestersWithSchedule}
+          value={selectedSemester}
+          onSelect={setSelectedSemester}
+          label="Semester / Year"
+        />
+        <ScheduleTable
+          dataArray={
+            selectedSemester === "-"
+              ? courseSchedule
+              : courseSchedule.filter(
+                  (c) => `${c.Semester}/${c.Year}` === selectedSemester
+                )
+          }
+        />
+      </ScrollView>
+    </View>
+  );
+};
+
+export default Page;
