@@ -19,7 +19,7 @@ export default function Index() {
 
   //DEV 
   function onStart() {
-    router.replace("academic_statistics", { relativeToDirectory: true });
+    router.replace("courseschedule_planner", { relativeToDirectory: true });
   }
   //DEV 
 

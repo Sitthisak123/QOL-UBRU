@@ -53,18 +53,15 @@ const getDynamicTimeRange = (data) => {
   return { start: toTimeString(minStart), end: toTimeString(maxEnd) };
 };
 
-// distinct colors per weekday
 const dayColors = ["#e9edc9", "#ffe5ec", "#caf0f8", "#faedcd", "#dee2ff"];
 
 export default function TimeScheduleTable() {
   const { start, end } = getDynamicTimeRange(dataArray1);
   const timeSlots = generateTimeSlots(start, end, 30);
 
-  // Render timetable header
   const renderTimeTable = () => (
-    <ScrollView horizontal style={styles.container}>
+    <ScrollView horizontal style={styles.container} showsHorizontalScrollIndicator={false}>
       <DataTable style={styles.table}>
-        {/* Header row */}
         <DataTable.Header style={styles.header}>
           <DataTable.Title style={styles.dayColumn}></DataTable.Title>
           {timeSlots.map((slot) => (
@@ -74,7 +71,6 @@ export default function TimeScheduleTable() {
           ))}
         </DataTable.Header>
 
-        {/* Each day row */}
         {days.map((day, dayIndex) => {
           const dayCourses = dataArray1.filter((c) => c.scourseScheduleDate === dayIndex);
           return (
@@ -83,7 +79,6 @@ export default function TimeScheduleTable() {
                 <Text style={styles.dayText}>{day}</Text>
               </DataTable.Cell>
 
-              {/* Render cells dynamically */}
               {(() => {
                 const cells = [];
                 let i = 0;
@@ -110,7 +105,7 @@ export default function TimeScheduleTable() {
                           styles.timeColumn,
                           {
                             backgroundColor: "#ffcb69",
-                            width: 70 * duration,
+                            width: columnWidth * duration,
                             justifyContent: "center",
                             alignItems: "center",
                             borderColor: "#dee2e6",
@@ -139,42 +134,57 @@ export default function TimeScheduleTable() {
   );
 
   return (
-    <FlatList
-      data={dataArray1}
-      keyExtractor={(item, index) => index.toString()}
-      ListHeaderComponent={
-        <View>
-          {renderTimeTable()}
+    <View style={styles.mainContainer}>
+      {/* Time Table Section with Horizontal Scroll */}
+      <View style={styles.tableWrapper}>
+        {renderTimeTable()}
+      </View>
+
+      {/* Course List Section with Vertical Scroll */}
+      <FlatList
+        data={dataArray1}
+        keyExtractor={(item, index) => index.toString()}
+        ListHeaderComponent={
           <Text style={styles.listTitle}>📘 Course Schedule Summary</Text>
-        </View>
-      }
-      renderItem={({ item, index }) => (
-        <View
-          style={[styles.listItem, { backgroundColor: dayColors[item.scourseScheduleDate % dayColors.length] }]}
-        >
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <Text style={styles.listIndex}>{index + 1}.</Text>
-            <Text style={styles.listDay}>{days[item.scourseScheduleDate]}</Text>
+        }
+        fadingEdgeLength={50}
+        renderItem={({ item, index }) => (
+          <View
+            style={[styles.listItem, { backgroundColor: dayColors[item.scourseScheduleDate % dayColors.length] }]}
+          >
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <Text style={styles.listIndex}>{index + 1}.</Text>
+              <Text style={styles.listDay}>{days[item.scourseScheduleDate]}</Text>
+            </View>
+            <Text style={styles.listCourseCode}>{item.courseCode}</Text>
+            <Text style={styles.listCourseName}>{item.courseName}</Text>
+            <Text style={styles.listScheduleTime}>{item.scourseScheduleTime}</Text>
           </View>
-          <Text style={styles.listCourseCode}>{item.courseCode}</Text>
-          <Text style={styles.listCourseName}>{item.courseName}</Text>
-          <Text style={styles.listScheduleTime}>{item.scourseScheduleTime}</Text>
-        </View>
-      )}
-      ListEmptyComponent={<Text style={{ textAlign: "center", marginTop: 20 }}>No courses found.</Text>}
-      contentContainerStyle={{ paddingBottom: 20 }}
-    />
+        )}
+        ListEmptyComponent={<Text style={{ textAlign: "center", marginTop: 20 }}>No courses found.</Text>}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      />
+    </View>
   );
 }
 
+const columnWidth = 50;
+
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+  },
+  tableWrapper: {
+    maxHeight: 350,
+  },
   container: {
     backgroundColor: "#e9ecef",
-    paddingVertical: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 0,
+    marginLeft: -16,
+    marginRight: -16,
   },
   table: {
-    borderRadius: 12,
-    overflow: "hidden",
     backgroundColor: "#fff",
     elevation: 2,
   },
@@ -188,7 +198,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   dayColumn: {
-    width: 70,
+    width: columnWidth,
     backgroundColor: "#14213d",
     justifyContent: "center",
   },
@@ -203,7 +213,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   timeColumn: {
-    width: 70,
+    width: columnWidth,
     height: 50,
     justifyContent: "center",
     alignItems: "center",
