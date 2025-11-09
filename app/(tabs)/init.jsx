@@ -76,21 +76,21 @@ function init() {
         setIsProgress(prev => ({ ...prev, schedule: true }));
         for (let i = 0; i < learnedYear + 1; i++) {
             await fetchSchedules(firstTwoSSID, i, setFetchProgress);
-            await new Promise(resolve => setTimeout(resolve, 550));
+            await new Promise(resolve => setTimeout(resolve, 125));
         }
 
         //step 2: Fetch plans|Courses
         setIsProgress(prev => ({ ...prev, plan: true }));
         for (let i = 0; i < 4; i++) {
             await fetchPlans(firstTwoSSID, i, setFetchProgress);
-            await new Promise(resolve => setTimeout(resolve, 550));
+            await new Promise(resolve => setTimeout(resolve, 125));
         }
 
         //step 3: Fetch exam schedules
         setIsProgress(prev => ({ ...prev, ExamSchedule: true }));
         for (let i = 0; i < learnedYear + 1; i++) {
             await fetchExamSchedules(firstTwoSSID, i, setFetchProgress);
-            await new Promise(resolve => setTimeout(resolve, 550));
+            await new Promise(resolve => setTimeout(resolve, 125));
         }
 
         //step 4: Fetch Grades
@@ -98,10 +98,10 @@ function init() {
         setFetchProgress(prev => ({ ...prev, grade: prev.grade + 1 }));
         await fetchGrades(firstTwoSSID, setFetchProgress);
 
-        // await new Promise(resolve => setTimeout(resolve, 3550));
         await initData();
+        // await new Promise(resolve => setTimeout(resolve, 125));
         
-        router.replace("home", { relativeToDirectory: true });
+        router.replace("academic_statistics", { relativeToDirectory: true });
     }
 
 

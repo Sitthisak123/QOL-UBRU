@@ -6,25 +6,25 @@ export default function CourseSchedulePlannerLayout() {
       <Tabs.Screen
         name="schedule"
         options={{
-          title: "Schedule",
-          tabBarLabel: "Schedule",
-          headerShown: false, // hides the top header
+          title: "ตารางเรียน",
+          tabBarLabel: "ตารางเรียน",
+          // headerShown: false, // hides the top header
         }}
       />
       <Tabs.Screen
         name="examschedule"
         options={{
-          title: "Exam Schedule",
-          tabBarLabel: "Exam",
-          headerShown: false, // hides the top header
+          title: "ตารางสอบ",
+          tabBarLabel: "ตารางสอบ",
+          // headerShown: false, // hides the top header
         }}
       />
       <Tabs.Screen
         name="list"
         options={{
-          title: "Course List",
-          tabBarLabel: "List",
-          headerShown: false, // hides the top header
+          title: "รายวิชา",
+          tabBarLabel: "รายวิชา",
+          // headerShown: false, // hides the top header
           // tabBarShowLabel: false, // hides the text under the icon
         }}
       />

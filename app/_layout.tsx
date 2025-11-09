@@ -25,7 +25,7 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
-  
+
 
   useEffect(() => {
     if (loaded) {
@@ -43,28 +43,104 @@ export default function RootLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Drawer>
           <Drawer.Screen
-            name="index" // Matches app/(drawer)/index.tsx
+            name="index"
             options={{
               drawerLabel: 'Index',
               title: 'Overview',
+              drawerItemStyle: { display: 'none' },
             }}
           />
           <Drawer.Screen
-            name="(tabs)/grades" // Matches app/(drawer)/user/[id].tsx
-            options={{
-              drawerLabel: 'Grades',
-              title: 'User Overview',
-            }}
-          />
-          <Drawer.Screen
-            name="(tabs)/init" // Matches app/(drawer)/user/[id].tsx
+            name="(tabs)/init"
             options={{
               drawerLabel: 'Initialization',
               title: '',
               swipeEnabled: false, // disable just for this screen.
               headerShown: false, // hide the header for this screen.
+              drawerItemStyle: { display: 'none' },
             }}
           />
+          <Drawer.Screen
+            name="(tabs)/auth"
+            options={{
+              drawerLabel: 'Login',
+              title: 'Login',
+              swipeEnabled: false, // disable just for this screen.
+              headerShown: false, // hide the header for this screen.
+              drawerItemStyle: { display: 'none' },
+            }}
+          />
+          <Drawer.Screen
+            name="(tabs)/home"
+            options={{
+              drawerLabel: '',
+              title: '',
+              swipeEnabled: false, // disable just for this screen.
+              headerShown: false, // hide the header for this screen.
+              drawerItemStyle: { display: 'none' },
+            }}
+          />
+          <Drawer.Screen
+            name="(tabs)/exam_schedule"
+            options={{
+              drawerLabel: 'ตารางสอบ',
+              title: 'ตารางสอบ',
+            }}
+          />
+          <Drawer.Screen
+            name="(tabs)/learning_plan"
+            options={{
+              drawerLabel: 'แผนการเรียน',
+              title: 'แผนการเรียน',
+            }}
+          />
+          <Drawer.Screen
+            name="(tabs)/class_scheduleTable"
+            options={{
+              drawerLabel: 'ตารางเรียน',
+              title: 'ตารางเรียน',
+            }}
+          />
+          <Drawer.Screen
+            name="(tabs)/grades"
+            options={{
+              drawerLabel: 'ผลการเรียน',
+              title: 'ผลการเรียน',
+            }}
+          />
+          <Drawer.Screen
+            name="(tabs)/academic_statistics"
+            options={{
+              drawerLabel: 'Academic Statistics',
+              title: 'Academic Statistics',
+            }}
+          />
+          <Drawer.Screen
+            name="courseschedule_planner"
+            options={{
+              drawerLabel: 'จัดตาราง',
+              title: 'จัดตาราง',
+              headerShown: false, // hide the header for this screen.
+
+            }}
+          />
+          <Drawer.Screen
+            name="+not-found"
+            options={{
+              drawerLabel: '',
+              title: '',
+              // drawerItemStyle: { display: 'none' },
+            }}
+          />
+                    <Drawer.Screen
+            name="(tabs)/gpa_Calculator"
+            options={{
+              drawerLabel: '',
+              title: '',
+              drawerItemStyle: { display: 'none' },
+            }}
+          />
+
         </Drawer>
         <StatusBar />
       </GestureHandlerRootView>
