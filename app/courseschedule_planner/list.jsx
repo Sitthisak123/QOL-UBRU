@@ -97,6 +97,7 @@ export default function List() {
 
       {/* Modal */}
       <Modal visible={modalVisible} animationType="slide">
+        <Text style={{fontSize: 25, textAlign: "center", marginTop: 8}}>เลือกรายวิชา</Text>
         <View style={{ flex: 1, padding: 20, backgroundColor: "white" }}>
           <TextInput
             placeholder="Search course..."

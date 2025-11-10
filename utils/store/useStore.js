@@ -17,6 +17,29 @@ const useUserInfo = create((set) => ({
 
 }));
 
+// const useCourseSchedule = create((set, get) => ({
+//   courseSchedule: [],
+
+//   // Set the entire schedule
+//   setCourseSchedule: (newSchedule) => set({ courseSchedule: newSchedule }),
+
+//   // Add a course to the schedule
+//   addCourse: (course) =>
+//     set((state) => ({
+//       courseSchedule: [...state.courseSchedule, course],
+//     })),
+
+//   // Remove a course by ID or some unique identifier
+//   removeCourse: (courseId) =>
+//     set((state) => ({
+//       courseSchedule: state.courseSchedule.filter((c) => c.id !== courseId),
+//     })),
+
+//   // Clear all courses
+//   clearCourseSchedule: () => set({ courseSchedule: [] }),
+// }));
+
+
 
 function groupCourse(courses) {
   const GEGroup = [...GEGroupName(), "GE"];
@@ -138,8 +161,8 @@ const useAcademicStore = create((set, get) => ({
     return
   },
 
-  setCourseinPlanner: (dataArray=[])=>{
-    set({courseinPlanner: dataArray})
+  setCourseinPlanner: (dataArray = []) => {
+    set({ courseinPlanner: dataArray })
   },
 
   setCourses: (courses) => {

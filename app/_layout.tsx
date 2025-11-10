@@ -1,9 +1,8 @@
 import { useFonts } from 'expo-font';
 import { Stack, Tabs, useNavigation } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Drawer } from 'expo-router/drawer';
@@ -13,6 +12,7 @@ import {
   MD3LightTheme,
   PaperProvider,
 } from 'react-native-paper';
+// import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -39,6 +39,7 @@ export default function RootLayout() {
 
 
   return (
+
     <PaperProvider theme={paperTheme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Drawer>
@@ -132,7 +133,7 @@ export default function RootLayout() {
               // drawerItemStyle: { display: 'none' },
             }}
           />
-                    <Drawer.Screen
+          <Drawer.Screen
             name="(tabs)/gpa_Calculator"
             options={{
               drawerLabel: '',
@@ -142,7 +143,7 @@ export default function RootLayout() {
           />
 
         </Drawer>
-        <StatusBar />
+        {/* <StatusBar /> */}
       </GestureHandlerRootView>
     </PaperProvider >
   );
