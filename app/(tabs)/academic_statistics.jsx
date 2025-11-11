@@ -40,14 +40,14 @@ function academic_statistics() {
   return (
     <View style={globalStyles.view}>
       <ScrollView style={globalStyles.scrollView}>
-        <View style={{ marginHorizontal: 20, flexDirection: "row", marginTop: 25 }}>
+        <View style={{ marginHorizontal: 15, flexDirection: "row", marginTop: 25 }}>
           <Avatar.Icon
             size={80}
             icon="account-outline"
             style={{ ...globalStyles.icon, marginRight: 10 }}
           />
           <View style={globalStyles.subView}>
-            <Text style={{ ...globalStyles.TextHeader, marginBottom: 10 }}>{Name}</Text>
+            <Text style={{ ...globalStyles.TextHeader, marginBottom: 5 }}>{Name}</Text>
             <Text style={{ ...globalStyles.DigiHeader, opacity: 0.8 }}>{textUser}</Text>
           </View>
           <Guage

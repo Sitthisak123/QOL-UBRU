@@ -16,12 +16,13 @@ export const globalCustomStyles = (theme) => ({
     color: theme.colors.text, // Use theme's text color
   },
   TextHeader: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 20,
+    // fontWeight: 'bold',
+    overflow: "hidden",
     color: theme.colors.primary, // Use primary color for text
   },
     DigiHeader: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: theme.colors.primary, // Use primary color for text
   },
@@ -41,7 +42,6 @@ export const dropdownStyles = (theme) => StyleSheet.create({
     flex: 1,
   },
   button: {
-    backgroundColor: theme.colors.primary,
     padding: 5,
     borderRadius: 5, 
     flexDirection: "row", 

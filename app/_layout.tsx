@@ -42,7 +42,15 @@ export default function RootLayout() {
 
     <PaperProvider theme={paperTheme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Drawer>
+        <Drawer screenOptions={{
+          headerStyle: {
+            backgroundColor: paperTheme.colors.surface, // header background color
+          },
+          headerTintColor: '#ffffff', // header text color (title & back button)
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}>
           <Drawer.Screen
             name="index"
             options={{

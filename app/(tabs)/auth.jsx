@@ -98,7 +98,7 @@ export default function Auth() {
       console.log("response Status: ", response.status);
       await asyncStorage_setItem('SSID', SSID);
       await asyncStorage_setItem('USER', { textUser: dataInput.STDID, txtPass: dataInput.pass });
-      setLogin({ SSID, textUser: dataInput.STDID, Name: 'Unvailable:2' });
+      setLogin({ SSID, textUser: dataInput.STDID, Name: 'นายสิทธิศักดิ์  เทพอาษา' });
       setIsLoading(false);
       router.replace("/init");
     } catch (error) {

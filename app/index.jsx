@@ -44,7 +44,7 @@ export default function Index() {
       const SSID = await asyncStorage_getItem('SSID')
       const userInfo = await asyncStorage_getItem('USER')
       if ((SSID && userInfo)) {
-        setLogin({ SSID, textUser: userInfo.textUser, Name: 'Unvailable:1' });
+        setLogin({ SSID, textUser: userInfo.textUser, Name: 'นายสิทธิศักดิ์  เทพอาษา' });
         // router.replace("home", { relativeToDirectory: true });
         await initData()
         onStart(); //DEV

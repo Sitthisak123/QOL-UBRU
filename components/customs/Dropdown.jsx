@@ -32,7 +32,7 @@ const Dropdown = ({
         <View style={[styles.container, propstyle]}>
             {/* Button to toggle dropdown */}
             <View>
-                <TouchableOpacity onPress={toggleDropdown} style={styles.button} activeOpacity={.85}>
+                <TouchableOpacity onPress={toggleDropdown} style={[styles.button, { backgroundColor: credit===maxCredit? "#10c81f":theme.colors.secondary }]} activeOpacity={.85}>
                     <Text style={styles.buttonText}>{headername}</Text>
                     <View style={{ flexDirection: "row", alignItems: "center", alignItems: "center", paddingRight: 10, gap: 5 }}>
                         <Text>{`${credit}/${maxCredit}`}</Text>
@@ -53,15 +53,6 @@ const Dropdown = ({
                 >
                     {componentList.length && isOpen ? (
                         <View style={styles.list}>
-                            {/* <TouchableOpacity style={styles.listItem}>
-                <Text style={styles.listItemText}>Option 1</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.listItem}>
-                <Text style={styles.listItemText}>Option 2</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.listItem}>
-                <Text style={styles.listItemText}>Option 3</Text>
-              </TouchableOpacity> */}
                             {componentList.map(item => item)}
                         </View>
                     ) : null}

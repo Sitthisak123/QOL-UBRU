@@ -42,7 +42,7 @@ const generateTimeSlots = (startTime, endTime, interval = 30) => {
   return slots;
 };
 
-const getDynamicTimeRange = (data=[]) => {
+const getDynamicTimeRange = (data) => {
   let minStart = Infinity;
   let maxEnd = -Infinity;
   data.forEach((item) => {
@@ -58,9 +58,9 @@ const getDynamicTimeRange = (data=[]) => {
 const dayColors = ["#e9edc9", "#ffe5ec", "#caf0f8", "#faedcd", "#dee2ff"];
 
 export default function TimeScheduleTable() {
-  const { start, end } = getDynamicTimeRange(courseinPlanner);
+  const { start, end } = getDynamicTimeRange(dataArray1);
   const timeSlots = generateTimeSlots(start, end, 30);
-  const { courseinPlanner, setCourseinPlanner } = useAcademicStore();
+  const {courseinPlanner, setCourseinPlanner} = useAcademicStore();
   const renderTimeTable = () => (
     <ScrollView horizontal style={styles.container} showsHorizontalScrollIndicator={false}>
       <DataTable style={styles.table}>
@@ -74,7 +74,7 @@ export default function TimeScheduleTable() {
         </DataTable.Header>
 
         {days.map((day, dayIndex) => {
-          const dayCourses = courseinPlanner.filter((c) => c.scourseScheduleDate === dayIndex);
+          const dayCourses = dataArray1.filter((c) => c.scourseScheduleDate === dayIndex);
           return (
             <DataTable.Row key={dayIndex} style={styles.row}>
               <DataTable.Cell style={styles.dayColumn}>
@@ -144,7 +144,7 @@ export default function TimeScheduleTable() {
 
       {/* Course List Section with Vertical Scroll */}
       <FlatList
-        data={courseinPlanner || []}
+        data={dataArray1}
         keyExtractor={(item, index) => index.toString()}
         ListHeaderComponent={
           <Text style={styles.listTitle}>📘 Course Schedule Summary</Text>

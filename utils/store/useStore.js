@@ -4,7 +4,7 @@ import { countCredits } from "../methods";
 import { GEGroupName } from "../globalVar";
 
 const useUserInfo = create((set) => ({
-  USER_info: { isInit: false, isLogin: false, SSID: '', textUser: '', loginDate: '', Name: 'Unvailable' },
+  USER_info: { isInit: false, isLogin: false, SSID: '', textUser: '', loginDate: '', Name: 'นายสิทธิศักดิ์  เทพอาษา' },
   login: (newstate) =>
     set((prevState) => ({
       USER_info: { ...newstate, isInit: true, isLogin: true, loginDate: new Date() }
@@ -13,7 +13,7 @@ const useUserInfo = create((set) => ({
     set((prevState) => ({
       USER_info: { ...prevState.USER_info, ...newstate }
     })),
-  logout: () => set(() => ({ USER_info: { isInit: true, isLogin: false, SSID: '', textUser: '', loginDate: '', Name: 'Unvailable' } })),
+  logout: () => set(() => ({ USER_info: { isInit: true, isLogin: false, SSID: '', textUser: '', loginDate: '', Name: 'นายสิทธิศักดิ์  เทพอาษา' } })),
 
 }));
 
