@@ -106,7 +106,7 @@ export default function RootLayout() {
           <Drawer.Screen
             name="(tabs)/class_scheduleTable"
             options={{
-              drawerLabel: 'ตารางเรียน',
+              drawerLabel: 'ตารางเรียนทั้งหมด',
               title: 'ตารางเรียน',
             }}
           />
@@ -127,8 +127,8 @@ export default function RootLayout() {
           <Drawer.Screen
             name="courseschedule_planner"
             options={{
-              drawerLabel: 'จัดตาราง',
-              title: 'จัดตาราง',
+              drawerLabel: 'ตารางเรียน',
+              title: 'ตารางเรียน',
               headerShown: false, // hide the header for this screen.
 
             }}

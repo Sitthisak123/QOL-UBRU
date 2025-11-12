@@ -1,24 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View, FlatList } from "react-native";
 import { DataTable, Text } from "react-native-paper";
 import { useAcademicStore } from "../../utils/store/useStore.js";
 
-
-// Example schedule data
-const dataArray1 = [
-  { courseCode: "MTH101", courseName: "Math", scourseScheduleDate: 0, scourseScheduleTime: "09:00-12:30" },
-  { courseCode: "PHY201", courseName: "Physics", scourseScheduleDate: 0, scourseScheduleTime: "13:30-15:00" },
-  { courseCode: "CHM301", courseName: "Chemistry", scourseScheduleDate: 1, scourseScheduleTime: "07:00-14:00" },
-  { courseCode: "BIO401", courseName: "Biology", scourseScheduleDate: 3, scourseScheduleTime: "10:30-12:00" },
-  { courseCode: "ART501", courseName: "Art", scourseScheduleDate: 4, scourseScheduleTime: "13:00-15:00" },
-];
-
-// Weekdays (0–6 where 0=Mon)
+// === Mapping Thai day to index (0=Mon … 4=Fri)
+const dayMap = { "จ": 0, "อ": 1, "พ": 2, "พฤ": 3, "ศ": 4 };
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+const dayColors = ["#e9edc9", "#ffe5ec", "#caf0f8", "#faedcd", "#dee2ff"];
+const columnWidth = 50;
 
+// === Helper functions ===
 const toMinutes = (time) => {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
+  // Accept formats "09:00" or "8.50"
+  if (!time) return 0;
+  const normalized = time.replace(".", ":");
+  const [h, m] = normalized.split(":").map(Number);
+  return h * 60 + (m || 0);
 };
 
 const toTimeString = (minutes) => {
@@ -42,25 +39,36 @@ const generateTimeSlots = (startTime, endTime, interval = 30) => {
   return slots;
 };
 
-const getDynamicTimeRange = (data) => {
+const getDynamicTimeRange = (data = []) => {
   let minStart = Infinity;
   let maxEnd = -Infinity;
   data.forEach((item) => {
-    const [start, end] = item.scourseScheduleTime.split("-");
+    const [start, end] = item.ScheduleTime.replace(/\./g, ":").split("-");
     const startMin = toMinutes(start);
     const endMin = toMinutes(end);
     if (startMin < minStart) minStart = startMin;
     if (endMin > maxEnd) maxEnd = endMin;
   });
+  if (minStart === Infinity || maxEnd === -Infinity)
+    return { start: "08:00", end: "17:00" };
   return { start: toTimeString(minStart), end: toTimeString(maxEnd) };
 };
 
-const dayColors = ["#e9edc9", "#ffe5ec", "#caf0f8", "#faedcd", "#dee2ff"];
-
+// === Main component ===
 export default function TimeScheduleTable() {
-  const { start, end } = getDynamicTimeRange(dataArray1);
+  const { courseScheduleSorted, semestersWithSchedule } = useAcademicStore();
+  const [dataArray, setCourses] = useState([]);
+
+  useEffect(() => {
+    const filtered = courseScheduleSorted.filter(
+      (c) => `${c.Semester}/${c.Year}` === semestersWithSchedule[semestersWithSchedule.length-1]
+    );
+    setCourses(filtered);
+  }, [courseScheduleSorted, semestersWithSchedule]);
+
+  const { start, end } = getDynamicTimeRange(dataArray);
   const timeSlots = generateTimeSlots(start, end, 30);
-  const {courseinPlanner, setCourseinPlanner} = useAcademicStore();
+
   const renderTimeTable = () => (
     <ScrollView horizontal style={styles.container} showsHorizontalScrollIndicator={false}>
       <DataTable style={styles.table}>
@@ -74,7 +82,9 @@ export default function TimeScheduleTable() {
         </DataTable.Header>
 
         {days.map((day, dayIndex) => {
-          const dayCourses = dataArray1.filter((c) => c.scourseScheduleDate === dayIndex);
+          const dayCourses = dataArray.filter(
+            (c) => dayMap[c.ScheduleDate] === dayIndex
+          );
           return (
             <DataTable.Row key={dayIndex} style={styles.row}>
               <DataTable.Cell style={styles.dayColumn}>
@@ -88,14 +98,14 @@ export default function TimeScheduleTable() {
                   const slot = timeSlots[i];
                   const slotMin = toMinutes(slot);
                   const course = dayCourses.find((c) => {
-                    const [start, end] = c.scourseScheduleTime.split("-");
+                    const [start, end] = c.ScheduleTime.replace(/\./g, ":").split("-");
                     const startMin = toMinutes(start);
                     const endMin = toMinutes(end);
                     return slotMin >= startMin && slotMin < endMin;
                   });
 
                   if (course) {
-                    const [start, end] = course.scourseScheduleTime.split("-");
+                    const [start, end] = course.ScheduleTime.replace(/\./g, ":").split("-");
                     const startMin = toMinutes(start);
                     const endMin = toMinutes(end);
                     const duration = Math.ceil((endMin - startMin) / 30);
@@ -115,7 +125,7 @@ export default function TimeScheduleTable() {
                           },
                         ]}
                       >
-                        <Text style={styles.cellText}>{course.courseName}</Text>
+                        <Text style={styles.cellText}>{course.CourseName}</Text>
                       </View>
                     );
                     i += duration;
@@ -137,30 +147,31 @@ export default function TimeScheduleTable() {
 
   return (
     <View style={styles.mainContainer}>
-      {/* Time Table Section with Horizontal Scroll */}
-      <View style={styles.tableWrapper}>
-        {renderTimeTable()}
-      </View>
+      {/* Time Table Section */}
+      <View style={styles.tableWrapper}>{renderTimeTable()}</View>
 
-      {/* Course List Section with Vertical Scroll */}
+      {/* Course List Section */}
       <FlatList
-        data={dataArray1}
+        data={dataArray}
         keyExtractor={(item, index) => index.toString()}
-        ListHeaderComponent={
-          <Text style={styles.listTitle}>📘 Course Schedule Summary</Text>
-        }
+        ListHeaderComponent={<Text style={styles.listTitle}>📘 Course Schedule Summary</Text>}
         fadingEdgeLength={50}
         renderItem={({ item, index }) => (
           <View
-            style={[styles.listItem, { backgroundColor: dayColors[item.scourseScheduleDate % dayColors.length] }]}
+            style={[
+              styles.listItem,
+              { backgroundColor: dayColors[dayMap[item.ScheduleDate] % dayColors.length] },
+            ]}
           >
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
               <Text style={styles.listIndex}>{index + 1}.</Text>
-              <Text style={styles.listDay}>{days[item.scourseScheduleDate]}</Text>
+              <Text style={styles.listDay}>{item.ScheduleDate}</Text>
             </View>
-            <Text style={styles.listCourseCode}>{item.courseCode}</Text>
-            <Text style={styles.listCourseName}>{item.courseName}</Text>
-            <Text style={styles.listScheduleTime}>{item.scourseScheduleTime}</Text>
+            <Text style={styles.listCourseCode}>{item.CourseCode}</Text>
+            <Text style={styles.listCourseName}>{item.CourseName}</Text>
+            <Text style={styles.listScheduleTime}>{item.ScheduleTime}</Text>
+            <Text style={{ color: "#6c757d", fontSize: 13 }}>Room: {item.ClassRoom}</Text>
+            <Text style={{ color: "#6c757d", fontSize: 13 }}>Teacher: {item.Teacher}</Text>
           </View>
         )}
         ListEmptyComponent={<Text style={{ textAlign: "center", marginTop: 20 }}>No courses found.</Text>}
@@ -170,50 +181,25 @@ export default function TimeScheduleTable() {
   );
 }
 
-const columnWidth = 50;
-
+// === Styles ===
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-  },
-  tableWrapper: {
-    maxHeight: 350,
-  },
+  mainContainer: { flex: 1 },
+  tableWrapper: { maxHeight: 350 },
   container: {
     backgroundColor: "#e9ecef",
     paddingVertical: 5,
-    paddingHorizontal: 0,
-    marginLeft: -16,
-    marginRight: -16,
+    marginHorizontal: -16,
   },
-  table: {
-    backgroundColor: "#fff",
-    elevation: 2,
-  },
-  header: {
-    backgroundColor: "#fcbf49",
-  },
-  headerText: {
-    fontWeight: "700",
-    textAlign: "center",
-    color: "#333",
-    fontSize: 12,
-  },
+  table: { backgroundColor: "#fff", elevation: 2 },
+  header: { backgroundColor: "#fcbf49" },
+  headerText: { fontWeight: "700", textAlign: "center", color: "#333", fontSize: 12 },
   dayColumn: {
     width: columnWidth,
     backgroundColor: "#14213d",
     justifyContent: "center",
   },
-  dayText: {
-    color: "#fff",
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  row: {
-    backgroundColor: "#f8f9fa",
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  dayText: { color: "#fff", fontWeight: "600", textAlign: "center" },
+  row: { backgroundColor: "#f8f9fa", flexDirection: "row", alignItems: "center" },
   timeColumn: {
     width: columnWidth,
     height: 50,
@@ -222,17 +208,9 @@ const styles = StyleSheet.create({
     borderColor: "#dee2e6",
     borderWidth: 0.5,
   },
-  emptyCell: {
-    backgroundColor: "#f8f9fa",
-  },
-  cellText: {
-    textAlign: "center",
-    color: "#333",
-    fontSize: 12,
-    fontWeight: "600",
-  },
+  emptyCell: { backgroundColor: "#f8f9fa" },
+  cellText: { textAlign: "center", color: "#333", fontSize: 12, fontWeight: "600" },
 
-  // === List styling ===
   listTitle: {
     fontSize: 18,
     fontWeight: "bold",
@@ -248,27 +226,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     elevation: 1,
   },
-  listIndex: {
-    fontWeight: "bold",
-    color: "#333",
-  },
-  listDay: {
-    fontWeight: "600",
-    color: "#6c757d",
-  },
-  listCourseCode: {
-    fontWeight: "600",
-    color: "#495057",
-  },
-  listCourseName: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "#212529",
-  },
-  listScheduleTime: {
-    fontSize: 17,
-    fontWeight: "800",
-    color: "#1d3557",
-    marginTop: 4,
-  },
+  listIndex: { fontWeight: "bold", color: "#333" },
+  listDay: { fontWeight: "600", color: "#6c757d" },
+  listCourseCode: { fontWeight: "600", color: "#495057" },
+  listCourseName: { fontSize: 15, fontWeight: "bold", color: "#212529" },
+  listScheduleTime: { fontSize: 17, fontWeight: "800", color: "#1d3557", marginTop: 4 },
 });

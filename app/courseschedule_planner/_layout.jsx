@@ -19,15 +19,16 @@ export default function CourseSchedulePlannerLayout() {
           // headerShown: false, // hides the top header
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="list"
         options={{
           title: "รายวิชา",
           tabBarLabel: "รายวิชา",
           // headerShown: false, // hides the top header
           // tabBarShowLabel: false, // hides the text under the icon
+          drawerItemStyle: { display: 'none' },
         }}
-      />
+      /> */}
     </Tabs>
   );
 }
