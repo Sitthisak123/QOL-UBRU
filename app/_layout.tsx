@@ -80,7 +80,7 @@ export default function RootLayout() {
             }}
           />
           <Drawer.Screen
-            name="(tabs)/home"
+            name="(tabs)/overview"
             options={{
               drawerLabel: '',
               title: '',
