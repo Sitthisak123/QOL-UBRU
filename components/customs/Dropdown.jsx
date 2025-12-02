@@ -18,7 +18,7 @@ const Dropdown = ({
     // const translateY = useSharedValue(0);
     const theme = useTheme();
     const styles = dropdownStyles(theme);
-
+    const bgColorr = maxCredit < 1 ? "#e99191" : credit === maxCredit ? "#10c81f" : theme.colors.secondary;
 
     // Toggle dropdown open/close
     const toggleDropdown = () => {
@@ -32,7 +32,7 @@ const Dropdown = ({
         <View style={[styles.container, propstyle]}>
             {/* Button to toggle dropdown */}
             <View>
-                <TouchableOpacity onPress={toggleDropdown} style={[styles.button, { backgroundColor: credit===maxCredit? "#10c81f":theme.colors.secondary }]} activeOpacity={.85}>
+                <TouchableOpacity onPress={toggleDropdown} style={[styles.button, { backgroundColor: bgColorr }]} activeOpacity={.85}>
                     <Text style={styles.buttonText}>{headername}</Text>
                     <View style={{ flexDirection: "row", alignItems: "center", alignItems: "center", paddingRight: 10, gap: 5 }}>
                         <Text>{`${credit}/${maxCredit}`}</Text>

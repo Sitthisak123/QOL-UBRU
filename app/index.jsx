@@ -45,7 +45,7 @@ export default function Index() {
       const userInfo = await asyncStorage_getItem('USER')
       if ((SSID && userInfo)) {
         setLogin({ SSID, textUser: userInfo.textUser, Name: 'นายสิทธิศักดิ์  เทพอาษา' });
-        // router.replace("home", { relativeToDirectory: true });
+        // router.replace("overview", { relativeToDirectory: true });
         await initData()
         onStart(); //DEV
       } else {
